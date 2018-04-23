@@ -1,0 +1,20 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass" style="@LayoutCss">
+    @ChildContent
+</div>
+
+@functions{
+
+    public ScrollMode HorizontalScrollMode { get; set; } = ScrollMode.Disabled;
+
+    public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Enabled;
+
+    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    {
+        base.ComputeOwnLayoutCss(sb);
+        sb.Append("display: block; "); // Scrolling doesn't work with 'display: grid', revert to 'block'
+        sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
+        sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
+    }
+}

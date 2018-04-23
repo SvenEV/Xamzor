@@ -1,0 +1,33 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass" style="@LayoutCss @StyleString">@Text</div>
+
+@functions{
+
+    public string Foreground { get; set; } = "black";
+
+    public string FontFamily { get; set; } = "Segoe UI";
+
+    public double FontSize { get; set; } = 16;
+
+    public FontWeight FontWeight { get; set; } = FontWeight.Normal;
+
+    public FontStyle FontStyle { get; set; } = FontStyle.Normal;
+
+    public TextWrapping TextWrapping { get; set; } = TextWrapping.WrapWholeWords;
+
+    public TextTrimming TextTrimming { get; set; } = TextTrimming.None;
+
+    public bool IsTextSelectionEnabled { get; set; } = false;
+
+    public string Text { get; set; }
+
+    private string StyleString =>
+        $"font-family: {FontFamily}; font-size: {FontSize}px; color: {Foreground};" +
+        $"font-weight: {(int)FontWeight};" +
+        $"font-style: {FontStyle.ToString().ToLower()};" +
+        $"white-space: {(TextWrapping == TextWrapping.NoWrap ? "nowrap" : "pre-line")};" +
+        $"overflow-wrap: {(TextWrapping == TextWrapping.Wrap ? "break-word" : "normal")};" +
+        $"text-overflow: {(TextTrimming == TextTrimming.Ellipsis ? "ellipsis" : "clip")};" +
+        (IsTextSelectionEnabled ? "" : "user-select: none; -ms-user-select: none; cursor: default;");
+}

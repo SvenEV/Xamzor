@@ -1,0 +1,23 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass"
+     style="position: absolute; width: 100%; height: 100%; display: grid;">
+    @ChildContent
+    <button onclick="@(e => StateHasChanged())" style="position: absolute; left: 0px; top: 64px; opacity: 0.3;">Refresh</button>
+</div>
+
+@functions{
+
+    public IXamzorViewOwner Owner { get; set; }
+
+    protected override void OnInit()
+    {
+        base.OnInit();
+        Owner?.OnXamzorViewInitialized(this);
+    }
+    
+    public interface IXamzorViewOwner
+    {
+        void OnXamzorViewInitialized(XamzorView view);
+    }
+}

@@ -1,0 +1,61 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass" style="@LayoutCss background-color: @Background;">
+    @ChildContent
+</div>
+
+@functions{
+
+    public IReadOnlyList<RowDefinition> RowDefinitions { get; set; }
+
+    public IReadOnlyList<ColumnDefinition> ColumnDefinitions { get; set; }
+
+    public double RowSpacing { get; set; } = 0;
+
+    public double ColumnSpacing { get; set; } = 0;
+
+    public string Background { get; set; } = "transparent";
+
+    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    {
+        base.ComputeOwnLayoutCss(sb);
+
+        if (RowDefinitions?.Count > 0)
+        {
+            sb.Append(
+                "grid-template-rows: " +
+                string.Join(" ", RowDefinitions.Select(def => GridLengthToCss(def.Height))) +
+                "; ");
+        }
+
+        if (ColumnDefinitions?.Count > 0)
+        {
+            sb.Append(
+                "grid-template-columns: " +
+                string.Join(" ", ColumnDefinitions.Select(def => GridLengthToCss(def.Width))) +
+                "; ");
+        }
+
+        if (RowSpacing != 0 || ColumnSpacing != 0)
+        {
+            sb.Append($"grid-gap: {RowSpacing}px {ColumnSpacing}px; ");
+        }
+
+        string GridLengthToCss(GridLength length)
+        {
+            switch (length.GridUnitType)
+            {
+                case GridUnitType.Auto: return "auto";
+                case GridUnitType.Absolute: return length.Value + "px";
+                case GridUnitType.Star: return length.Value + "fr";
+                default: throw new NotImplementedException();
+            }
+        }
+    }
+
+    protected override void ComputeChildLayoutCss(System.Text.StringBuilder sb, UIElement child)
+    {
+        base.ComputeChildLayoutCss(sb, child);
+        sb.Append($"grid-area: {child.Row + 1} / {child.Column + 1} / span {child.RowSpan} / span {child.ColumnSpan}; ");
+    }
+}

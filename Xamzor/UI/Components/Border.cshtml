@@ -1,0 +1,21 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass" style="@LayoutCss
+     background-color: @Background;
+     border-color: @BorderBrush; border-style: solid;
+     border-width: @(BorderThickness.Top)px @(BorderThickness.Right)px @(BorderThickness.Bottom)px @(BorderThickness.Left)px;
+     border-radius: @(CornerRadius.Top)px @(CornerRadius.Right)px @(CornerRadius.Bottom)px @(CornerRadius.Left)px;">
+
+    @ChildContent
+</div>
+
+@functions{
+
+    public Thickness BorderThickness { get; set; } = Thickness.Zero;
+
+    public Thickness CornerRadius { get; set; } = Thickness.Zero;
+
+    public string Background { get; set; } = "transparent";
+
+    public string BorderBrush { get; set; } = "transparent";
+}

@@ -1,0 +1,19 @@
+﻿@inherits UIElement
+
+<button id="@Id" class="@CssClass" style="@LayoutCss" onclick="@OnClicked">
+    <!--
+        'button' seems to somehow stretch its child content, even if child content wants to
+        align left/right/center. Another 'div' in between fixes this.
+    -->
+    <div style="display: grid">
+        @ChildContent
+    </div>
+</button>
+
+@functions{
+
+    // This is a property because adding handlers to events via tag helpers doesn't seem to be supported yet
+    public EventHandler<UIMouseEventArgs> Clicked { get; set; }
+    
+    private void OnClicked(UIMouseEventArgs e) => Clicked?.Invoke(this, e);
+}

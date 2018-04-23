@@ -1,0 +1,26 @@
+﻿@inherits UIElement
+
+<div id="@Id" class="@CssClass" style="@LayoutCss background-color: @Background;">
+    @ChildContent
+</div>
+
+@functions{
+
+    public Orientation Orientation { get; set; } = Orientation.Vertical;
+
+    public string Background { get; set; } = "transparent";
+
+    public double Spacing { get; set; } = 0;
+
+    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    {
+        base.ComputeOwnLayoutCss(sb);
+
+        var isHorizontal = Orientation == Orientation.Horizontal;
+        sb.Append($"grid-auto-flow: {(isHorizontal ? "column" : "row")}; ");
+        sb.Append($"grid-auto-{(isHorizontal ? "columns" : "rows")}: max-content; ");
+
+        if (Spacing != 0)
+            sb.Append($"grid-gap: {Spacing}px; ");
+    }
+}

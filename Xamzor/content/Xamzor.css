@@ -1,0 +1,63 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* prevents overscrolling */
+}
+
+.XButton {
+    background: none;
+    border: none;
+    transition: transform .3s;
+}
+
+.XButton:hover {
+    background-color: rgba(255, 255, 255, .078);
+}
+
+.XButton:active {
+    background-color: rgba(255, 255, 255, .16);
+    transform: scale(.95);
+    transition: transform .1s;
+}
+
+.XButton:focus {
+    outline: none;
+}
+
+.debug1 {
+    outline: 4px solid red;
+}
+
+.debug2 {
+    outline: 4px solid yellow;
+}
+
+.appload-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.appload {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: .15;
+    background: linear-gradient(100deg, transparent 20%, white 50%, transparent 80%);
+    animation: appload-animation 1800ms infinite linear;
+}
+
+@keyframes appload-animation {
+    0% {
+        transform: translate(-200%);
+    }
+
+    100% {
+        transform: translate(200%);
+    }
+}
