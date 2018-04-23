@@ -2,8 +2,15 @@
 
 <div id="@Id" class="@CssClass"
      style="position: absolute; width: 100%; height: 100%; display: grid;">
+    
     @ChildContent
-    <button onclick="@(e => StateHasChanged())" style="position: absolute; left: 0px; top: 64px; opacity: 0.3;">Refresh</button>
+    
+    @if (Application.IsDebugOutlineEnabled)
+    {
+        <button onclick="@(e => StateHasChanged())" style="position: absolute; left: 0px; top: 64px; opacity: 0.3;">
+            Refresh
+        </button>
+    }
 </div>
 
 @functions{
