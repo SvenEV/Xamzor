@@ -45,6 +45,8 @@ namespace Xamzor.UI.Components
 
         public Alignment VerticalAlignment { get; set; } = Alignment.Stretch;
 
+        public double Opacity { get; set; } = 1;
+
         // Temporary properties - we'll invent some form of "attached properties" in the future
         public int Row { get; set; } = 0;
         public int Column { get; set; } = 0;
@@ -99,7 +101,10 @@ namespace Xamzor.UI.Components
 
         protected virtual void ComputeOwnLayoutCss(StringBuilder sb)
         {
-            sb.Append("display: grid; overflow: hidden; ");
+            // Note: "position: relative" fixes element stacking issues
+            sb.Append("display: grid; overflow: hidden; position: relative; ");
+            sb.Append($"grid-template-rows: 1fr; ");
+            sb.Append($"grid-template-columns: 1fr; ");
 
             if (!double.IsNaN(Width))
                 sb.Append($"width: {Width}px; ");
@@ -115,9 +120,16 @@ namespace Xamzor.UI.Components
 
             if (MaxWidth != double.PositiveInfinity)
                 sb.Append($"max-width: {MaxWidth}px; ");
+            else
+                sb.Append("max-width: 100%; ");
 
             if (MaxHeight != double.PositiveInfinity)
                 sb.Append($"max-height: {MaxHeight}px; ");
+            else
+                sb.Append("max-height: 100%; ");
+
+            if (Opacity != 1)
+                sb.Append($"opacity: {Opacity}; ");
 
             sb.Append($"margin: {ThicknessToCss(Margin)}; ");
             sb.Append($"padding: {ThicknessToCss(Padding)}; ");

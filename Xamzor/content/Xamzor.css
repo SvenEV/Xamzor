@@ -16,7 +16,7 @@
 
 .XButton:active {
     background-color: rgba(255, 255, 255, .16);
-    transform: scale(.95);
+    transform: scale(.98);
     transition: transform .1s;
 }
 

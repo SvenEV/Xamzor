@@ -19,6 +19,7 @@
         var isHorizontal = Orientation == Orientation.Horizontal;
         sb.Append($"grid-auto-flow: {(isHorizontal ? "column" : "row")}; ");
         sb.Append($"grid-auto-{(isHorizontal ? "columns" : "rows")}: max-content; ");
+        sb.Append($"grid-template-{(isHorizontal ? "columns" : "rows")}: none; ");
 
         if (Spacing != 0)
             sb.Append($"grid-gap: {Spacing}px; ");

@@ -17,4 +17,15 @@
         sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
     }
+
+    protected override void ComputeChildLayoutCss(System.Text.StringBuilder sb, UIElement child)
+    {
+        base.ComputeChildLayoutCss(sb, child);
+
+        if (HorizontalScrollMode != ScrollMode.Disabled)
+            sb.Append($"max-width: none; ");
+
+        if (VerticalScrollMode != ScrollMode.Disabled)
+            sb.Append($"max-height: none; ");
+    }
 }
