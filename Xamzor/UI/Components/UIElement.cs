@@ -121,12 +121,12 @@ namespace Xamzor.UI.Components
             if (MaxWidth != double.PositiveInfinity)
                 sb.Append($"max-width: {MaxWidth}px; ");
             else
-                sb.Append("max-width: 100%; ");
+                sb.Append($"max-width: calc(100% - {Margin.HorizontalThickness}px); ");
 
             if (MaxHeight != double.PositiveInfinity)
                 sb.Append($"max-height: {MaxHeight}px; ");
             else
-                sb.Append("max-height: 100%; ");
+                sb.Append($"max-height: calc(100% - {Margin.VerticalThickness}px); ");
 
             if (Opacity != 1)
                 sb.Append($"opacity: {Opacity}; ");
