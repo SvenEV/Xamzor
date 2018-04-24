@@ -61,3 +61,52 @@
         transform: translate(200%);
     }
 }
+
+.ProgressRing > div {
+    width: 88%;
+    height: 88%;
+    left: 6%;
+    top: 6%;
+    position: absolute;
+    transform-origin: 50% 50%;
+    opacity: 0;
+}
+
+.ProgressRing.active > div {
+    animation: ProgressRing-animation 4.385s infinite linear;
+}
+
+.ProgressRing > div > div {
+    position: absolute;
+    width: 12%;
+    height: 12%;
+    left: 0%;
+    top: 50%;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    transform: translate(-50%,-50%);
+}
+
+@keyframes ProgressRing-animation {
+
+    0% { opacity: 1; transform: rotate(-110deg); }
+
+    74.3% { opacity: 1; }
+    74.5% { opacity: 0; }
+    80.3% { opacity: 0; }
+
+    10.0% { transform: rotate(10deg); }
+    27.8% { transform: rotate(93deg); }
+    37.4% { transform: rotate(205deg); }
+    46.7% { transform: rotate(357deg); }
+    64.4% { transform: rotate(439deg); }
+    74.51% { transform: rotate(585deg); }
+                
+    100% { opacity: 0; transform: rotate(810deg); }
+}
+
+.ProgressRing > div:nth-child(2) { animation-delay: 167ms; }
+.ProgressRing > div:nth-child(3) { animation-delay: 334ms; }
+.ProgressRing > div:nth-child(4) { animation-delay: 501ms; }
+.ProgressRing > div:nth-child(5) { animation-delay: 668ms; }
+.ProgressRing > div:nth-child(6) { animation-delay: 835ms; }

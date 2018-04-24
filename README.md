@@ -3,7 +3,7 @@
 
 Xamzor is an experimental project in which I try to prototype a set of reusable Blazor components that are familiar to XAML developers and make it easy to compose web views that feel like native apps.
 
-The list of [Xamzor components](https://github.com/SvenEV/Xamzor/tree/master/Xamzor/UI/Components) currently includes the most common layout controls (Grid, StackPanel, Border, ScrollViewer) as well as TextBlock, Image and Button.
+The list of [Xamzor components](https://github.com/SvenEV/Xamzor/tree/master/Xamzor/UI/Components) currently includes the most common layout controls (Grid, StackPanel, Border, ScrollViewer) as well as TextBlock, Image, Button and ProgressRing.
 
 👉 **[Try the Live Demo](http://xamzor.azurewebsites.net/)**  
 *(this always runs the latest commit and may therefore be broken from time to time)*
