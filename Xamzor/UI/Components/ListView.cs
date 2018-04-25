@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.RenderTree;
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 
 namespace Xamzor.UI.Components
 {
     public class ListView : UIElement
     {
-        public IEnumerable<object> ItemsSource { get; set; }
+        public IEnumerable ItemsSource { get; set; }
 
         /// <summary>
         /// Should have a property "DataContext".
