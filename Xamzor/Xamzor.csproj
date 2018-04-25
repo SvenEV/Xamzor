@@ -23,4 +23,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.3.0-preview1-10200" />
   </ItemGroup>
 
+  <ItemGroup>
+    <BlazorGenerate Remove="UI\Components\ListViewDefaultItemsPanel.cshtml" />
+  </ItemGroup>
+
 </Project>

@@ -39,7 +39,7 @@ namespace Xamzor.UI.Components
         public string Tag { get; set; }
 
         // HACK
-        public UIElement PARENT { get; set; }
+        public UIElement Parent { get; set; }
 
         public Alignment HorizontalAlignment { get; set; } = Alignment.Stretch;
 
@@ -75,13 +75,16 @@ namespace Xamzor.UI.Components
                 {
                     var temp = Helpers.PARENT;
                     Helpers.PARENT = this;
-                    originalChildContent?.Invoke(builder);
+                    originalChildContent(builder);
                     Helpers.PARENT = temp;
                 };
             }
 
+            if (Parent == null && !(this is XamzorView))
+                UILog.Write("WARNING", $"Parent is null on '{this}'");
+
             UpdateLayoutCss();
-            UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{PARENT}')");
+            UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{Parent}')");
         }
 
         public override string ToString() => GetType().Name + " " + Tag;
@@ -95,7 +98,7 @@ namespace Xamzor.UI.Components
         {
             var sb = new StringBuilder();
             ComputeOwnLayoutCss(sb);
-            PARENT?.ComputeChildLayoutCss(sb, this);
+            Parent?.ComputeChildLayoutCss(sb, this);
             LayoutCss = sb.ToString();
         }
 
