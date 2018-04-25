@@ -25,14 +25,9 @@
             Stretch == ImageStretch.None ? "none" :
             throw new NotImplementedException();
 
-        sb.Append($"justify-self: stretch; align-self: stretch; ");
-        sb.Append("width: initial; height: initial; ");
-        sb.Append("min-width: initial; min-height: initial; ");
-        sb.Append("max-width: initial; max-height: initial; ");
         sb.Append($"background-image: url({Source}); ");
         sb.Append($"background-size: {size}; ");
         sb.Append($"background-position: {AlignmentToPosition(HorizontalAlignment)} {AlignmentToPosition(VerticalAlignment)}; ");
-        sb.Append("background-repeat: no-repeat; ");
     }
 
     private string InnerCss
@@ -56,9 +51,13 @@
 
             if (MaxWidth != double.PositiveInfinity)
                 sb.Append($"max-width: {MaxWidth}px; ");
+            else
+                sb.Append($"max-width: 100%; ");
 
             if (MaxHeight != double.PositiveInfinity)
                 sb.Append($"max-height: {MaxHeight}px; ");
+            else
+                sb.Append($"max-height: 100%; ");
 
             switch (Stretch)
             {

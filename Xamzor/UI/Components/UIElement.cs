@@ -2,19 +2,22 @@
 using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Blazor.RenderTree;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Xamzor.UI.Components
 {
     public class UIElement : BlazorComponent, IDisposable
     {
+        private readonly string _cssClasses;
         private bool _debugRenderCount = false;
 
         protected string LayoutCss { get; private set; }
 
         protected string CssClass => Application.IsDebugOutlineEnabled
-            ? GetType().Name + " " + (_debugRenderCount ? "debug1" : "debug2")
-            : GetType().Name;
+            ? _cssClasses + (_debugRenderCount ? "debug1" : "debug2")
+            : _cssClasses;
 
         public string Id { get; }
 
@@ -56,6 +59,17 @@ namespace Xamzor.UI.Components
         public UIElement()
         {
             Id = GetType().Name + "_" + Guid.NewGuid().ToString();
+            _cssClasses = string.Join(" ", GetBaseTypes(GetType()).Select(t => t.Name));
+
+            IEnumerable<Type> GetBaseTypes(Type type)
+            {
+                while (type != typeof(UIElement))
+                {
+                    yield return type;
+                    type = type.BaseType;
+                }
+                yield return typeof(UIElement);
+            }
         }
 
         protected override void OnInit()
@@ -104,11 +118,6 @@ namespace Xamzor.UI.Components
 
         protected virtual void ComputeOwnLayoutCss(StringBuilder sb)
         {
-            // Note: "position: relative" fixes element stacking issues
-            sb.Append("display: grid; overflow: hidden; position: relative; ");
-            sb.Append($"grid-template-rows: 1fr; ");
-            sb.Append($"grid-template-columns: 1fr; ");
-
             if (!double.IsNaN(Width))
                 sb.Append($"width: {Width}px; ");
 
@@ -123,12 +132,12 @@ namespace Xamzor.UI.Components
 
             if (MaxWidth != double.PositiveInfinity)
                 sb.Append($"max-width: {MaxWidth}px; ");
-            else
+            else if (HorizontalAlignment != Alignment.Stretch)
                 sb.Append($"max-width: calc(100% - {Margin.HorizontalThickness}px); ");
 
             if (MaxHeight != double.PositiveInfinity)
                 sb.Append($"max-height: {MaxHeight}px; ");
-            else
+            else if (VerticalAlignment != Alignment.Stretch)
                 sb.Append($"max-height: calc(100% - {Margin.VerticalThickness}px); ");
 
             if (Opacity != 1)

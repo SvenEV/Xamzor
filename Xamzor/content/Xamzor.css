@@ -4,6 +4,26 @@
     overflow: hidden; /* prevents overscrolling */
 }
 
+.UIElement {
+    display: grid;
+    overflow: hidden;
+    position: relative; /* fixes element stacking (z-index) issues */
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+}
+
+.UIElement.Image {
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    width: initial !important;
+    height: initial !important;
+    min-width: initial !important;
+    min-height: initial !important;
+    max-width: initial !important;
+    max-height: initial !important;
+    background-repeat: no-repeat;
+}
+
 .XButton {
     background: none;
     border: none;

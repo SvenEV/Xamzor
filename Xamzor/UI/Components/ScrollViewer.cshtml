@@ -1,7 +1,13 @@
 ﻿@inherits UIElement
 
 <div id="@Id" class="@CssClass" style="@LayoutCss">
-    @ChildContent
+    <!--
+        Bottom and right padding are not honored when scrolling is enabled 
+        so we need an extra div.
+    -->
+    <div style="@InnerCss">
+        @ChildContent
+    </div>
 </div>
 
 @functions{
@@ -10,12 +16,17 @@
 
     public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Enabled;
 
+    private string InnerCss { get; set; }
+
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
         base.ComputeOwnLayoutCss(sb);
         sb.Append("display: block; "); // Scrolling doesn't work with 'display: grid', revert to 'block'
         sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
+        sb.Append("padding: 0; "); // padding is instead applied to inner div
+
+        InnerCss = $"margin: {ThicknessToCss(Padding)}; ";
     }
 
     protected override void ComputeChildLayoutCss(System.Text.StringBuilder sb, UIElement child)
