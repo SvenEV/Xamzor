@@ -1,0 +1,22 @@
+﻿@page "/"
+
+<div style="position: absolute; width: 100%; height: 100%; display: grid;">
+
+    <Grid RowDefinitions="@Rows("Auto", "*")">
+        <Border Background="@ThemeColor" Padding="T(24,12)">
+            <TextBlock Text="Xamzor Demo App"
+                       Foreground="white"
+                       FontSize="32" />
+        </Border>
+
+        <TextBlock Row="1"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Text="Demo content coming soon." />
+    </Grid>
+
+</div>
+
+@functions {
+    public const string ThemeColor = "#7014e8";
+}
