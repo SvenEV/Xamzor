@@ -17,11 +17,11 @@
 
     public ScrollMode HorizontalScrollMode { get; set; } = ScrollMode.Disabled;
 
-    public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Enabled;
+    public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Auto;
 
     public ZoomMode ZoomMode { get; set; } = ZoomMode.Disabled;
 
-    public ScrollBarVisibility ScrollBarVisibility { get; set; } = ScrollBarVisibility.Auto;
+    public ScrollBarVisibility ScrollBarVisibility { get; set; } = ScrollBarVisibility.Visible;
 
     private string InnerCss { get; set; }
 
@@ -31,23 +31,7 @@
         sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append("padding: 0; "); // padding is instead applied to inner div
-
-        if (ZoomMode == ZoomMode.Enabled)
-        {
-            sb.Append("-ms-content-zooming: zoom; ");
-        }
-
-        switch (ScrollBarVisibility)
-        {
-            case ScrollBarVisibility.Auto:
-                sb.Append("-ms-overflow-style: -ms-autohiding-scrollbar; ");
-                break;
-
-            case ScrollBarVisibility.Hidden:
-                sb.Append("-ms-overflow-style: hidden; ");
-                break;
-        }
-
+        
         // Compute CSS for inner div
         var innerCss = new System.Text.StringBuilder("display: grid; border-style: solid; border-color: transparent; ");
         innerCss.Append($"border-width: {ThicknessToCss(Padding)}; ");
