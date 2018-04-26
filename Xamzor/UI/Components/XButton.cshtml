@@ -3,7 +3,7 @@
 <!--
     TODO: We really want to use <button> here but "max-height" is zero inside buttons in Firefox
 -->
-<div id="@Id" class="@CssClass" style="@LayoutCss" onclick="@OnClicked">
+<div id="@Id" class="@CssClass" style="@LayoutCss" onclick="@((Action<UIMouseEventArgs>)OnClicked)">
     <!--
         'button' seems to somehow stretch its child content, even if child content wants to
         align left/right/center. Another 'div' in between fixes this.
