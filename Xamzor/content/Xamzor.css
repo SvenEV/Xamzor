@@ -42,7 +42,7 @@
     display: none;
 }
 
-.UIElement.ScrollViewer[xamzor-scrollbarvisibility="Auto"] {
+.UIElement.ScrollViewer[xamzor-scrollbarvisibility="AutoHide"] {
     -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 

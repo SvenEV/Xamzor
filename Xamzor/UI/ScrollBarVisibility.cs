@@ -5,7 +5,7 @@
         /// <summary>
         /// Only works in Edge.
         /// </summary>
-        Auto,
+        AutoHide,
 
         /// <summary>
         /// Only works in Edge, Webkit.
