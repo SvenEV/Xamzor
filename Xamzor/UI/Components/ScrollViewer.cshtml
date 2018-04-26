@@ -1,6 +1,8 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss">
+<div id="@Id" class="@CssClass" style="@LayoutCss"
+     xamzor-zoommode="@ZoomMode"
+     xamzor-scrollbarvisibility="@ScrollBarVisibility">
     <!--
         Bottom and right padding are not honored when scrolling is enabled 
         so we need an extra div with border (margin doesn't work there either
@@ -17,6 +19,10 @@
 
     public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Enabled;
 
+    public ZoomMode ZoomMode { get; set; } = ZoomMode.Disabled;
+
+    public ScrollBarVisibility ScrollBarVisibility { get; set; } = ScrollBarVisibility.Auto;
+
     private string InnerCss { get; set; }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
@@ -25,6 +31,22 @@
         sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append("padding: 0; "); // padding is instead applied to inner div
+
+        if (ZoomMode == ZoomMode.Enabled)
+        {
+            sb.Append("-ms-content-zooming: zoom; ");
+        }
+
+        switch (ScrollBarVisibility)
+        {
+            case ScrollBarVisibility.Auto:
+                sb.Append("-ms-overflow-style: -ms-autohiding-scrollbar; ");
+                break;
+
+            case ScrollBarVisibility.Hidden:
+                sb.Append("-ms-overflow-style: hidden; ");
+                break;
+        }
 
         // Compute CSS for inner div
         var innerCss = new System.Text.StringBuilder("display: grid; border-style: solid; border-color: transparent; ");

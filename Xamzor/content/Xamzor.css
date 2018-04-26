@@ -30,6 +30,22 @@
     visibility: hidden;
 }
 
+.UIElement.ScrollViewer[xamzor-zoommode="Enabled"] {
+    -ms-content-zooming: zoom;
+}
+
+.UIElement.ScrollViewer[xamzor-scrollbarvisibility="Hidden"] {
+    -ms-overflow-style: none;
+}
+
+.UIElement.ScrollViewer[xamzor-scrollbarvisibility="Hidden"]::-webkit-scrollbar {
+    display: none;
+}
+
+.UIElement.ScrollViewer[xamzor-scrollbarvisibility="Auto"] {
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
 .XButton {
     background: none;
     border: none;
