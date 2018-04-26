@@ -42,10 +42,6 @@
     display: none;
 }
 
-.UIElement.ScrollViewer[xamzor-scrollbarvisibility="AutoHide"] {
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-}
-
 .XButton {
     background: none;
     border: none;
