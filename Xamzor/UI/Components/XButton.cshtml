@@ -1,6 +1,9 @@
 ﻿@inherits UIElement
 
-<button id="@Id" class="@CssClass" style="@LayoutCss" onclick="@OnClicked">
+<!--
+    TODO: We really want to use <button> here but "max-height" is zero inside buttons in Firefox
+-->
+<div id="@Id" class="@CssClass" style="@LayoutCss" onclick="@OnClicked">
     <!--
         'button' seems to somehow stretch its child content, even if child content wants to
         align left/right/center. Another 'div' in between fixes this.
@@ -8,7 +11,7 @@
     <div style="display: grid">
         @ChildContent
     </div>
-</button>
+</div>
 
 @functions{
 
