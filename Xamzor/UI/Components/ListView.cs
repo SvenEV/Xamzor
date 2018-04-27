@@ -7,7 +7,16 @@ namespace Xamzor.UI.Components
     public class ListView : ItemsControl
     {
         public EventHandler<object> ItemClicked { get; set; }
-        
+
+        protected override void BuildItemsPanelRenderTree(RenderTreeBuilder builder, RenderFragment renderItems)
+        {
+            // In contrast to ItemsControl, we want ListView to include a ScrollViewer by default
+            builder.OpenComponent(4, ItemsPanelTemplate ?? typeof(ListViewDefaultItemsPanel));
+            builder.AddAttribute(5, nameof(Parent), this);
+            builder.AddAttribute(6, nameof(ChildContent), renderItems);
+            builder.CloseComponent();
+        }
+
         protected override void BuildItemRenderTree(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent<ListViewItem>(0);

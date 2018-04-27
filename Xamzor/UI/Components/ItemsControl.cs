@@ -22,7 +22,7 @@ namespace Xamzor.UI.Components
         /// <summary>
         /// The component type used to render the container panel for all items.
         /// If null, <see cref="ItemsControlDefaultItemsPanel"/> is used which
-        /// renders a scrollable, vertical stack of items.
+        /// renders a vertical stack of items.
         /// </summary>
         public Type ItemsPanelTemplate { get; set; }
 
