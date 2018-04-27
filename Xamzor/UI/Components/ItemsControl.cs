@@ -35,16 +35,21 @@ namespace Xamzor.UI.Components
             builder.AddAttribute(2, "class", CssClass);
             builder.AddAttribute(3, "style", LayoutCss);
 
-            builder.OpenComponent(4, ItemsPanelTemplate ?? typeof(ItemsControlDefaultItemsPanel));
-            builder.AddAttribute(5, nameof(Parent), this);
-            builder.AddAttribute(6, nameof(ChildContent), (RenderFragment)(builder2 =>
+            BuildItemsPanelRenderTree(builder, innerBuilder =>
             {
                 foreach (var item in Items ?? Enumerable.Empty<object>())
-                    BuildItemRenderTree(builder2, item);
-            }));
-            builder.CloseComponent();
+                    BuildItemRenderTree(innerBuilder, item);
+            });
 
             builder.CloseElement();
+        }
+
+        protected virtual void BuildItemsPanelRenderTree(RenderTreeBuilder builder, RenderFragment renderItems)
+        {
+            builder.OpenComponent(4, ItemsPanelTemplate ?? typeof(ItemsControlDefaultItemsPanel));
+            builder.AddAttribute(5, nameof(Parent), this);
+            builder.AddAttribute(6, nameof(ChildContent), renderItems);
+            builder.CloseComponent();
         }
 
         /// <summary>
