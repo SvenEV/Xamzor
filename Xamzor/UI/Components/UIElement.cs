@@ -10,6 +10,8 @@ namespace Xamzor.UI.Components
 {
     public class UIElement : BlazorComponent, IDisposable
     {
+        private static long _nextFreeId = 0;
+
         private readonly string _cssClasses;
         private bool _debugRenderCount = false;
 
@@ -58,7 +60,7 @@ namespace Xamzor.UI.Components
 
         public UIElement()
         {
-            Id = GetType().Name + "_" + Guid.NewGuid().ToString();
+            Id = GetType().Name + "-" + _nextFreeId++;
             _cssClasses = string.Join(" ", GetBaseTypes(GetType()).Select(t => t.Name));
 
             IEnumerable<Type> GetBaseTypes(Type type)
