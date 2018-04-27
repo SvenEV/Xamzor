@@ -16,7 +16,7 @@ namespace Xamzor.UI.Components
         protected string LayoutCss { get; private set; }
 
         protected string CssClass => Application.IsDebugOutlineEnabled
-            ? _cssClasses + (_debugRenderCount ? "debug1" : "debug2")
+            ? _cssClasses + (_debugRenderCount ? " debug1" : " debug2")
             : _cssClasses;
 
         public string Id { get; }
