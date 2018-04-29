@@ -2,21 +2,48 @@
 
 <div style="position: absolute; width: 100%; height: 100%; display: grid;">
 
-    <Grid RowDefinitions="@Rows("Auto", "*")">
-        <Border Background="@ThemeColor" Padding="T(24,12)">
-            <TextBlock Text="Xamzor Demo App"
+    <Grid Parent="PARENT" RowDefinitions="@Rows("Auto", "*")"
+          Background="#eee">
+
+        <Border Parent="PARENT" Background="@ThemeColor" Padding="T(24,12)">
+            <TextBlock Parent="PARENT"
+                       Text="Xamzor Demo App"
                        Foreground="white"
                        FontSize="32" />
         </Border>
 
-        <TextBlock Row="1"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Text="Demo content coming soon." />
+        @*<TextBlock Parent="PARENT" Row="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Text="Demo content coming soon." />*@
+
+        <FlipView Parent="PARENT" Items="@Demos" Row="1"
+                  ItemTemplate="typeof(DemoPresenter)"/>
+
     </Grid>
 
 </div>
 
 @functions {
     public const string ThemeColor = "#7014e8";
+
+    private static ComponentGalleryItem[] Demos = new[]
+    {
+        new ComponentGalleryItem
+        {
+            Title = "StackPanel",
+            View = typeof(StackPanelDemo)
+        },
+        new ComponentGalleryItem
+        {
+            Title = "Image",
+            View = typeof(StackPanelDemo)
+        }
+    };
+
+    public class ComponentGalleryItem
+    {
+        public string Title { get; set; }
+        public Type View { get; set; }
+    }
 }

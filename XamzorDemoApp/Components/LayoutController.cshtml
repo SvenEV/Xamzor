@@ -1,0 +1,66 @@
+﻿
+<Border Parent="PARENT" Margin="T(0,4)" Padding="T(4)">
+    <StackPanel Parent="PARENT">
+
+        <TextBlock Parent="PARENT"
+                   Text="@Target()?.Tag"
+                   FontWeight="FontWeight.SemiBold" />
+
+        @if (Target() is StackPanel)
+        {
+            <StackPanel Parent="PARENT" Orientation="Horizontal">
+                <TextBlock Parent="PARENT" VerticalAlignment="Center">Orientation:</TextBlock>
+                <XButton Parent="PARENT" Content="Horizontal" Clicked="(_, e) => SetStackPanelOrientation(Orientation.Horizontal)" />
+                <XButton Parent="PARENT" Content="Vertical" Clicked="(_, e) => SetStackPanelOrientation(Orientation.Vertical)" />
+            </StackPanel>
+        }
+
+        <StackPanel Parent="PARENT" Orientation="Horizontal">
+            <TextBlock Parent="PARENT" Text="HorizontalAlignment:" VerticalAlignment="Center" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Stretch)" Content="Stretch" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Start)" Content="Left" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Center)" Content="Center" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.End)" Content="Right" />
+        </StackPanel>
+
+        <StackPanel Parent="PARENT" Orientation="Horizontal">
+            <TextBlock Parent="PARENT" Text="VerticalAlignment:" VerticalAlignment="Center" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Stretch)" Content="Stretch"/>
+            <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Start)" Content="Top" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Center)" Content="Center" />
+            <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.End)" Content="Bottom" />
+        </StackPanel>
+
+    </StackPanel>
+</Border>
+
+@functions{
+
+    /// <summary>
+    /// The element of which the properties should be manipulated.
+    /// </summary>
+    public Func<UIElement> Target { get; set; }
+
+    /// <summary>
+    /// The method that rerenders the target component.
+    /// </summary>
+    public Action UpdateTarget { get; set; }
+
+    private void SetHorizontalAlignment(Alignment alignment)
+    {
+        Target().HorizontalAlignment = alignment;
+        UpdateTarget?.Invoke();
+    }
+
+    private void SetVerticalAlignment(Alignment alignment)
+    {
+        Target().VerticalAlignment = alignment;
+        UpdateTarget?.Invoke();
+    }
+
+    private void SetStackPanelOrientation(Orientation orientation)
+    {
+        ((StackPanel)Target()).Orientation = orientation;
+        UpdateTarget?.Invoke();
+    }
+}

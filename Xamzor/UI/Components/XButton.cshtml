@@ -1,15 +1,16 @@
-﻿@inherits UIElement
+﻿@inherits ContentControl
 
 <!--
     TODO: We really want to use <button> here but "max-height" is zero inside buttons in Firefox
 -->
-<div id="@Id" class="@CssClass" style="@LayoutCss" onclick="@((Action<UIMouseEventArgs>)OnClicked)">
+<div id="@Id" class="@CssClass" style="@LayoutCss" role="button" tabindex="0"
+     onclick="@((Action<UIMouseEventArgs>)OnClicked)">
     <!--
         'button' seems to somehow stretch its child content, even if child content wants to
         align left/right/center. Another 'div' in between fixes this.
     -->
     <div style="display: grid">
-        @ChildContent
+        @ActualContent
     </div>
 </div>
 
@@ -19,6 +20,13 @@
     public EventHandler<UIMouseEventArgs> Clicked { get; set; }
 
     private void OnClicked(UIMouseEventArgs e) => Clicked?.Invoke(this, e);
+
+    protected override bool OverridesContainer => true;
+
+    public XButton()
+    {
+        Padding = new Thickness(12, 8);
+    }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {

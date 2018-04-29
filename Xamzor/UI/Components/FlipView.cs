@@ -9,9 +9,20 @@ namespace Xamzor.UI.Components
         {
             // TODO: Should we expose 'ItemsPanelTemplate' at all in 'ItemsControl', even if
             // a derived class does not honor it (as in this case)?
-            builder.OpenComponent(4, typeof(FlipViewItemsPanel));
-            builder.AddAttribute(5, nameof(Parent), this);
-            builder.AddAttribute(6, nameof(ChildContent), renderItems);
+            builder.OpenComponent(0, typeof(FlipViewItemsPanel));
+            builder.AddAttribute(1, nameof(Parent), this);
+            builder.AddAttribute(2, nameof(ChildContent), renderItems);
+            builder.CloseComponent();
+        }
+
+        protected override void BuildItemRenderTree(RenderTreeBuilder builder, object item)
+        {
+            // Each item is wrapped in a horizontally & vertically stretching Border
+            // to ensure that it covers 100% of the FlipView rect
+            builder.OpenComponent<Border>(0);
+            builder.AddAttribute(1, nameof(Parent), Helpers.PARENT);
+            builder.AddAttribute(2, nameof(ChildContent), 
+                (RenderFragment)(innerBuilder => base.BuildItemRenderTree(innerBuilder, item)));
             builder.CloseComponent();
         }
     }

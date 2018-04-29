@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Blazor.RenderTree;
+﻿using Microsoft.AspNetCore.Blazor;
+using Microsoft.AspNetCore.Blazor.RenderTree;
 using System;
 
 namespace Xamzor.UI.Components
@@ -17,23 +18,32 @@ namespace Xamzor.UI.Components
         /// </summary>
         public Type ContentTemplate { get; set; }
 
+        protected virtual bool OverridesContainer => false;
+
+        protected RenderFragment ActualContent => BuildContentRenderTree;
+
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             base.BuildRenderTree(builder);
 
-            builder.OpenElement(0, "div");
-            builder.AddAttribute(1, "id", Id);
-            builder.AddAttribute(2, "class", CssClass);
-            builder.AddAttribute(3, "style", LayoutCss);
-
-            BuildContentRenderTree(builder);
-
-            builder.CloseElement();
+            if (!OverridesContainer)
+            {
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "id", Id);
+                builder.AddAttribute(2, "class", CssClass);
+                builder.AddAttribute(3, "style", LayoutCss);
+                BuildContentRenderTree(builder);
+                builder.CloseElement();
+            }
         }
 
         protected virtual void BuildContentRenderTree(RenderTreeBuilder builder)
         {
-            if (ContentTemplate != null)
+            if (ChildContent != null)
+            {
+                ChildContent(builder);
+            }
+            else if (ContentTemplate != null)
             {
                 builder.OpenComponent(0, ContentTemplate);
                 builder.AddAttribute(1, nameof(Parent), Helpers.PARENT);

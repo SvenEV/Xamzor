@@ -1,0 +1,51 @@
+﻿@implements IDataTemplate<object>
+
+<Grid Parent="PARENT" ColumnDefinitions="@Columns("*", "*")">
+
+    <StackPanel Parent="PARENT" Column="0">
+        <LayoutController Target="() => _stack" UpdateTarget="StateHasChanged" />
+        <LayoutController Target="() => _box1" UpdateTarget="StateHasChanged" />
+        <LayoutController Target="() => _box2" UpdateTarget="StateHasChanged" />
+        <LayoutController Target="() => _box3" UpdateTarget="StateHasChanged" />
+    </StackPanel>
+
+    <Border Parent="PARENT"
+            Column="1"
+            BorderBrush="black"
+            BorderThickness="T(2)">
+
+        <StackPanel Parent="PARENT" Ref="_stack" Tag="StackPanel">
+            
+            <Border Parent="PARENT" Ref="_box1" 
+                    MinWidth="100" MinHeight="100"
+                    Background="red" Tag="Red Box"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+
+            <Border Parent="PARENT" Ref="_box2" 
+                    MinWidth="150" MinHeight="50"
+                    Background="yellow" Tag="Yellow Box" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" />
+            
+            <Border Parent="PARENT" Ref="_box3" 
+                    MinWidth="50" MinHeight="150"
+                    Background="green" Tag="Green Box" 
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+
+        </StackPanel>
+    </Border>
+
+</Grid>
+
+@functions{
+    public object DataContext { get; set; }
+
+    public UIElement Parent { get; set; }
+
+    private StackPanel _stack;
+    private Border _box1;
+    private Border _box2;
+    private Border _box3;
+}

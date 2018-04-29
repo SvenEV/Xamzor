@@ -7,6 +7,6 @@ namespace Xamzor.UI
         T DataContext { get; set; }
 
         // TODO: Temporary, remove if no longer needed
-        UIElement PARENT { get; set; }
+        UIElement Parent { get; set; }
     }
 }

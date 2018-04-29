@@ -96,14 +96,14 @@ namespace Xamzor.UI.Components
                 };
             }
 
-            if (Parent == null && !(this is XamzorView))
-                UILog.Write("WARNING", $"Parent is null on '{this}'");
+            if (!parameters.TryGetValue(nameof(Parent), out object _))
+                UILog.Write("WARNING", $"No parent assigned to '{this}'");
 
             UpdateLayoutCss();
             UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{Parent}')");
         }
 
-        public override string ToString() => GetType().Name + " " + Tag;
+        public override string ToString() => Id + (Tag == null ? "" :  "-" + Tag);
 
         public virtual void Dispose()
         {
@@ -145,8 +145,11 @@ namespace Xamzor.UI.Components
             if (Opacity != 1)
                 sb.Append($"opacity: {Opacity}; ");
 
-            sb.Append($"margin: {ThicknessToCss(Margin)}; ");
-            sb.Append($"padding: {ThicknessToCss(Padding)}; ");
+            if (Margin != Thickness.Zero)
+                sb.Append($"margin: {ThicknessToCss(Margin)}; ");
+
+            if (Padding != Thickness.Zero)
+                sb.Append($"padding: {ThicknessToCss(Padding)}; ");
 
             // If the element cannot effectively stretch due to size constraints (Width/MaxWidth),
             // CSS will align it at 'start' instead. To get the typical XAML behavior ('center'),

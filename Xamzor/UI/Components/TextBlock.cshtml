@@ -1,6 +1,16 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss @StyleString">@Text</div>
+<div id="@Id" 
+     class="@CssClass" 
+     style="@LayoutCss @StyleString">@if (Text != null)
+    {
+        @Text
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>
 
 @functions{
 

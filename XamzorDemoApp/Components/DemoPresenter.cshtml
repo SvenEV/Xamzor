@@ -1,0 +1,20 @@
+﻿@implements IDataTemplate<Index.ComponentGalleryItem>
+
+<Grid Parent="PARENT" Background="white"
+      Margin="T(60)" Padding="T(20)"
+      RowDefinitions="@Rows("Auto", "*")">
+
+    <TextBlock Parent="PARENT"
+               Text="@DataContext.Title"
+               Margin="T(0,0,0,12)"
+               FontSize="32"
+               FontWeight="FontWeight.SemiBold" />
+    
+    <ContentControl Parent="PARENT" Row="1"
+                    ContentTemplate="@DataContext.View" />
+</Grid>
+
+@functions{
+    public Index.ComponentGalleryItem DataContext { get; set; }
+    public UIElement Parent { get; set; }
+}

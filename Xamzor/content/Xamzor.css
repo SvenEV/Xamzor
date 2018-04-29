@@ -52,22 +52,24 @@
 }
 
 .XButton {
-    background: none;
-    border: none;
+    background-color: #CCCCCC;
+    border: 2px solid #CCCCCC;
     transition: transform .3s;
 }
 
 .XButton:hover {
-    background-color: rgba(255, 255, 255, .078);
+    border: 2px solid #7A7A7A;
 }
 
 .XButton:active {
-    background-color: rgba(255, 255, 255, .16);
+    background-color: #999999;
+    border: 2px solid #999999;
     transform: scale(.98);
     transition: transform .1s;
 }
 
 .XButton:focus {
+    border: 2px solid #7A7A7A;
     outline: none;
 }
 

@@ -1,6 +1,8 @@
-﻿namespace Xamzor.UI
+﻿using System;
+
+namespace Xamzor.UI
 {
-    public struct Thickness
+    public struct Thickness : IEquatable<Thickness>
     {
         public static readonly Thickness Zero = new Thickness(0);
 
@@ -47,6 +49,28 @@
         public static implicit operator Thickness((double left, double top, double right, double bottom) t) =>
             new Thickness(t.left, t.top, t.right, t.bottom);
 
+        public static bool operator ==(Thickness a, Thickness b) => a.Equals(b);
+
+        public static bool operator !=(Thickness a, Thickness b) => !(a == b);
+
         public override string ToString() => $"[{Left}, {Top}, {Right}, {Bottom}]";
+
+        public override bool Equals(object obj) => obj is Thickness t && Equals(t);
+
+        public bool Equals(Thickness other) =>
+            Left == other.Left &&
+            Top == other.Top &&
+            Right == other.Right &&
+            Bottom == other.Bottom;
+
+        public override int GetHashCode()
+        {
+            var hashCode = -1819631549;
+            hashCode = hashCode * -1521134295 + Left.GetHashCode();
+            hashCode = hashCode * -1521134295 + Top.GetHashCode();
+            hashCode = hashCode * -1521134295 + Right.GetHashCode();
+            hashCode = hashCode * -1521134295 + Bottom.GetHashCode();
+            return hashCode;
+        }
     }
 }
