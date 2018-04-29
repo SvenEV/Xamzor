@@ -33,6 +33,7 @@
     public string Text { get; set; }
 
     private string StyleString =>
+        $"display: initial; " +
         $"font-family: {FontFamily}; font-size: {FontSize}px; color: {Foreground};" +
         $"font-weight: {(int)FontWeight};" +
         $"font-style: {FontStyle.ToString().ToLower()};" +
