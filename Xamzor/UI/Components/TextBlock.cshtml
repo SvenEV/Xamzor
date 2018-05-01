@@ -1,8 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" 
-     class="@CssClass" 
-     style="@LayoutCss @StyleString">@if (Text != null)
+<div id="@Id" class="@CssClass" style="@LayoutCss">@if (Text != null)
     {
         @Text
     }
@@ -32,13 +30,33 @@
 
     public string Text { get; set; }
 
-    private string StyleString =>
-        $"display: initial; " +
-        $"font-family: {FontFamily}; font-size: {FontSize}px; color: {Foreground};" +
-        $"font-weight: {(int)FontWeight};" +
-        $"font-style: {FontStyle.ToString().ToLower()};" +
-        $"white-space: {(TextWrapping == TextWrapping.NoWrap ? "nowrap" : "pre-line")};" +
-        $"overflow-wrap: {(TextWrapping == TextWrapping.Wrap ? "break-word" : "normal")};" +
-        $"text-overflow: {(TextTrimming == TextTrimming.Ellipsis ? "ellipsis" : "clip")};" +
-        (IsTextSelectionEnabled ? "" : "user-select: none; -ms-user-select: none; cursor: default;");
+    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    {
+        base.ComputeOwnLayoutCss(sb);
+
+        if (FontFamily != null)
+            sb.Append($"font-family: {FontFamily}; ");
+
+        sb.Append($"font-size: {FontSize}px; ");
+
+        if (Foreground != null)
+            sb.Append($"color: {Foreground}; ");
+
+        if (FontWeight != FontWeight.Normal)
+            sb.Append($"font-weight: {(int)FontWeight}; ");
+
+        if (FontStyle != FontStyle.Normal)
+            sb.Append($"font-style: {FontStyle.ToString().ToLower()}; ");
+
+        sb.Append($"white-space: {(TextWrapping == TextWrapping.NoWrap ? "nowrap" : "pre-line")}; ");
+
+        if (TextWrapping == TextWrapping.Wrap)
+            sb.Append($"overflow-wrap: break-word; ");
+
+        if (TextTrimming != TextTrimming.None)
+            sb.Append($"text-overflow: ellipsis; ");
+
+        if (!IsTextSelectionEnabled)
+            sb.Append("user-select: none; -ms-user-select: none; cursor: default; ");
+    }
 }

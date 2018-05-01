@@ -1,13 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss
-     background-color: @Background;
-     border-color: @BorderBrush; border-style: solid;
-     border-width: @(BorderThickness.Top)px @(BorderThickness.Right)px @(BorderThickness.Bottom)px @(BorderThickness.Left)px;
-     border-radius: @(CornerRadius.Top)px @(CornerRadius.Right)px @(CornerRadius.Bottom)px @(CornerRadius.Left)px;">
-
-    @ChildContent
-</div>
+<div id="@Id" class="@CssClass" style="@LayoutCss">@ChildContent</div>
 
 @functions{
 
@@ -15,7 +8,24 @@
 
     public Thickness CornerRadius { get; set; } = Thickness.Zero;
 
-    public string Background { get; set; } = "transparent";
+    public string Background { get; set; }
 
-    public string BorderBrush { get; set; } = "transparent";
+    public string BorderBrush { get; set; }
+
+    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    {
+        base.ComputeOwnLayoutCss(sb);
+
+        if (Background != null)
+            sb.Append($"background-color: {Background}; ");
+
+        if (BorderBrush != null)
+            sb.Append($"border-color: {BorderBrush}; ");
+
+        if (BorderThickness != Thickness.Zero)
+            sb.Append($"border-width: {ThicknessToCss(BorderThickness)}; border-style: solid;");
+
+        if (CornerRadius != Thickness.Zero)
+            sb.Append($"border-radius: {ThicknessToCss(CornerRadius)}; ");
+    }
 }

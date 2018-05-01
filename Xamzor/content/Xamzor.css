@@ -12,6 +12,10 @@
     grid-template-columns: 1fr;
 }
 
+.UIElement.TextBlock {
+    display: initial;
+}
+
 .UIElement.Image {
     justify-self: stretch !important;
     align-self: stretch !important;

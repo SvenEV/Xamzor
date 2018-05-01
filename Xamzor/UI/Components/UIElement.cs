@@ -24,7 +24,7 @@ namespace Xamzor.UI.Components
         public string Id { get; }
 
         public RenderFragment ChildContent { get; set; }
-        
+
         public double Width { get; set; } = double.NaN;
 
         public double Height { get; set; } = double.NaN;
@@ -103,7 +103,7 @@ namespace Xamzor.UI.Components
             UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{Parent}')");
         }
 
-        public override string ToString() => Id + (Tag == null ? "" :  "-" + Tag);
+        public override string ToString() => Id + (Tag == null ? "" : "-" + Tag);
 
         public virtual void Dispose()
         {
@@ -172,8 +172,14 @@ namespace Xamzor.UI.Components
             //if (!canStretchV && MaxHeight != double.PositiveInfinity)
             //    sb.Append($"height: {MaxHeight}px; ");
 
-            sb.Append($"justify-self: {AlignmentToCss(HorizontalAlignment, canStretchH)}; ");
-            sb.Append($"align-self: {AlignmentToCss(VerticalAlignment, canStretchV)}; ");
+            var justifySelf = AlignmentToCss(HorizontalAlignment, canStretchH);
+            var alignSelf = AlignmentToCss(VerticalAlignment, canStretchV);
+
+            if (justifySelf != "stretch")
+                sb.Append($"justify-self: {justifySelf}; ");
+
+            if (alignSelf != "stretch")
+                sb.Append($"align-self: {alignSelf}; ");
         }
 
         protected virtual void ComputeChildLayoutCss(StringBuilder sb, UIElement child)
