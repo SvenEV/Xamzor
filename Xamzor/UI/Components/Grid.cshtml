@@ -6,15 +6,17 @@
 
 @functions{
 
-    public IReadOnlyList<RowDefinition> RowDefinitions { get; set; }
+    public static readonly PropertyKey RowProperty = PropertyKey.Create<int, Grid>(nameof(Row), 0);
+    public static readonly PropertyKey ColumnProperty = PropertyKey.Create<int, Grid>(nameof(Column), 0);
+    public static readonly PropertyKey RowSpanProperty = PropertyKey.Create<int, Grid>(nameof(RowSpan), 1);
+    public static readonly PropertyKey ColumnSpanProperty = PropertyKey.Create<int, Grid>(nameof(ColumnSpan), 1);
 
-    public IReadOnlyList<ColumnDefinition> ColumnDefinitions { get; set; }
 
-    public double RowSpacing { get; set; } = 0;
-
-    public double ColumnSpacing { get; set; } = 0;
-
-    public string Background { get; set; } = "transparent";
+    [Parameter] protected IReadOnlyList<RowDefinition> RowDefinitions { get; set; }
+    [Parameter] protected IReadOnlyList<ColumnDefinition> ColumnDefinitions { get; set; }
+    [Parameter] protected double RowSpacing { get; set; } = 0;
+    [Parameter] protected double ColumnSpacing { get; set; } = 0;
+    [Parameter] protected string Background { get; set; } = "transparent";
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
@@ -56,6 +58,12 @@
     protected override void ComputeChildLayoutCss(System.Text.StringBuilder sb, UIElement child)
     {
         base.ComputeChildLayoutCss(sb, child);
-        sb.Append($"grid-area: {child.Row + 1} / {child.Column + 1} / span {child.RowSpan} / span {child.ColumnSpan}; ");
+
+        var row = child.Properties.Get<int>(RowProperty);
+        var column = child.Properties.Get<int>(ColumnProperty);
+        var rowSpan = child.Properties.Get<int>(RowSpanProperty);
+        var columnSpan = child.Properties.Get<int>(ColumnSpanProperty);
+
+        sb.Append($"grid-area: {row + 1} / {column + 1} / span {rowSpan} / span {columnSpan}; ");
     }
 }

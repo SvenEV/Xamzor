@@ -24,7 +24,7 @@ namespace Xamzor.UI
         public const ImageStretch UniformToFill = UI.ImageStretch.UniformToFill;
 
         // HACK
-        public static UIElement PARENT { get; set; }
+        public static XamzorComponent PARENT { get; set; }
 
         public static IReadOnlyList<RowDefinition> Rows(params string[] sizeStrings) =>
             sizeStrings.Select(s => new RowDefinition(GridLength.Parse(s))).ToList();

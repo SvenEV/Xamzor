@@ -4,13 +4,10 @@
 
 @functions{
 
-    public Thickness BorderThickness { get; set; } = Thickness.Zero;
-
-    public Thickness CornerRadius { get; set; } = Thickness.Zero;
-
-    public string Background { get; set; }
-
-    public string BorderBrush { get; set; }
+    [Parameter] protected Thickness BorderThickness { get; set; } = Thickness.Zero;
+    [Parameter] protected Thickness CornerRadius { get; set; } = Thickness.Zero;
+    [Parameter] protected string Background { get; set; }
+    [Parameter] protected string BorderBrush { get; set; }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
