@@ -6,7 +6,10 @@
 
 @functions {
 
-    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+    public static readonly PropertyKey OrientationProperty = PropertyKey.Create<Orientation, FlipViewItemsPanel>(nameof(Orientation), Orientation.Horizontal);
+
+    [Parameter]
+    protected Orientation Orientation { get => Properties.Get<Orientation>(OrientationProperty); set => Properties.Set(OrientationProperty, value); }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {

@@ -15,13 +15,15 @@
 
 @functions{
 
-    public ScrollMode HorizontalScrollMode { get; set; } = ScrollMode.Disabled;
+    public static readonly PropertyKey HorizontalScrollModeProperty = PropertyKey.Create<ScrollMode, ScrollViewer>(nameof(HorizontalScrollMode), ScrollMode.Disabled);
+    public static readonly PropertyKey VerticalScrollModeProperty = PropertyKey.Create<ScrollMode, ScrollViewer>(nameof(VerticalScrollMode), ScrollMode.Auto);
+    public static readonly PropertyKey ZoomModeProperty = PropertyKey.Create<ZoomMode, ScrollViewer>(nameof(ZoomMode), ZoomMode.Disabled);
+    public static readonly PropertyKey ScrollBarVisibilityProperty = PropertyKey.Create<ScrollBarVisibility, ScrollViewer>(nameof(ScrollBarVisibility), ScrollBarVisibility.Visible);
 
-    public ScrollMode VerticalScrollMode { get; set; } = ScrollMode.Auto;
-
-    public ZoomMode ZoomMode { get; set; } = ZoomMode.Disabled;
-
-    public ScrollBarVisibility ScrollBarVisibility { get; set; } = ScrollBarVisibility.Visible;
+    [Parameter] protected ScrollMode HorizontalScrollMode { get => Properties.Get<ScrollMode>(HorizontalScrollModeProperty); set => Properties.Set(HorizontalScrollModeProperty, value); }
+    [Parameter] protected ScrollMode VerticalScrollMode { get => Properties.Get<ScrollMode>(VerticalScrollModeProperty); set => Properties.Set(VerticalScrollModeProperty, value); }
+    [Parameter] protected ZoomMode ZoomMode { get => Properties.Get<ZoomMode>(ZoomModeProperty); set => Properties.Set(ZoomModeProperty, value); }
+    [Parameter] protected ScrollBarVisibility ScrollBarVisibility { get => Properties.Get<ScrollBarVisibility>(ScrollBarVisibilityProperty); set => Properties.Set(ScrollBarVisibilityProperty, value); }
 
     private string InnerCss { get; set; }
 
@@ -31,7 +33,7 @@
         sb.Append($"overflow-x: {(HorizontalScrollMode == ScrollMode.Disabled ? "hidden" : HorizontalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append($"overflow-y: {(VerticalScrollMode == ScrollMode.Disabled ? "hidden" : VerticalScrollMode == ScrollMode.Enabled ? "scroll" : "auto")}; ");
         sb.Append("padding: 0; "); // padding is instead applied to inner div
-        
+
         // Compute CSS for inner div
         var innerCss = new System.Text.StringBuilder("display: grid; border-style: solid; border-color: transparent; ");
         innerCss.Append($"border-width: {ThicknessToCss(Padding)}; ");

@@ -11,7 +11,6 @@
     public static readonly PropertyKey RowSpanProperty = PropertyKey.Create<int, Grid>(nameof(RowSpan), 1);
     public static readonly PropertyKey ColumnSpanProperty = PropertyKey.Create<int, Grid>(nameof(ColumnSpan), 1);
 
-
     [Parameter] protected IReadOnlyList<RowDefinition> RowDefinitions { get; set; }
     [Parameter] protected IReadOnlyList<ColumnDefinition> ColumnDefinitions { get; set; }
     [Parameter] protected double RowSpacing { get; set; } = 0;

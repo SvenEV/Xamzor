@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Blazor;
+using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Blazor.RenderTree;
 using System;
 
@@ -6,17 +7,22 @@ namespace Xamzor.UI.Components
 {
     public class ContentControl : UIElement
     {
+        public static readonly PropertyKey ContentProperty = PropertyKey.Create<object, ContentControl>(nameof(Content));
+        public static readonly PropertyKey ContentTemplateProperty = PropertyKey.Create<Type, ContentControl>(nameof(ContentTemplate));
+
         /// <summary>
         /// The data object to display.
         /// </summary>
-        public object Content { get; set; }
+        [Parameter]
+        protected object Content { get => Properties.Get<object>(ContentProperty); set => Properties.Set(ContentProperty, value); }
 
         /// <summary>
         /// The component type used to render each item. Should implement <see cref="IDataTemplate{T}"/>.
         /// If null, a string representation of <see cref="Content"/> is rendered using a
         /// <see cref="TextBlock"/>.
         /// </summary>
-        public Type ContentTemplate { get; set; }
+        [Parameter]
+        protected Type ContentTemplate { get => Properties.Get<Type>(ContentTemplateProperty); set => Properties.Set(ContentTemplateProperty, value); }
 
         protected virtual bool OverridesContainer => false;
 
@@ -46,15 +52,15 @@ namespace Xamzor.UI.Components
             else if (ContentTemplate != null)
             {
                 builder.OpenComponent(0, ContentTemplate);
-                builder.AddAttribute(1, nameof(Parent), Helpers.PARENT);
-                builder.AddAttribute(2, nameof(IDataTemplate<object>.DataContext), Content);
+                builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(2, DataTemplate.DataContextProperty.Name, Content);
                 builder.CloseComponent();
             }
             else if (Content != null)
             {
                 builder.OpenComponent<TextBlock>(3);
-                builder.AddAttribute(4, nameof(Parent), Helpers.PARENT);
-                builder.AddAttribute(5, nameof(TextBlock.Text), Content?.ToString());
+                builder.AddAttribute(4, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(5, TextBlock.TextProperty.Name, Content?.ToString());
                 builder.CloseComponent();
             }
         }

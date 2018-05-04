@@ -9,7 +9,14 @@
 
 @functions{
 
-    public bool IsActive { get; set; }
+    public static readonly PropertyKey IsActiveProperty = PropertyKey.Create<bool, ProgressRing>(nameof(IsActive));
+
+    [Parameter]
+    protected bool IsActive
+    {
+        get => Properties.Get<bool>(IsActiveProperty);
+        set => Properties.Set(IsActiveProperty, value);
+    }
 
     public string Foreground { get; set; } = "mediumturquoise";
 

@@ -8,8 +8,8 @@
 
         @if (ShowOrientation)
         {
-            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1">
-                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150">Orientation:</TextBlock>
+            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1.0">
+                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150.0">Orientation:</TextBlock>
                 <XButton Parent="PARENT" Content="Horizontal" Clicked="(_, e) => SetStackPanelOrientation(Orientation.Horizontal)" />
                 <XButton Parent="PARENT" Content="Vertical" Clicked="(_, e) => SetStackPanelOrientation(Orientation.Vertical)" />
             </StackPanel>
@@ -17,16 +17,16 @@
 
         @if (ShowAlignment)
         {
-            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1">
-                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150">HorizontalAlignment:</TextBlock>
+            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1.0">
+                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150.0">HorizontalAlignment:</TextBlock>
                 <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Stretch)" Content="Stretch" />
                 <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Start)" Content="Left" />
                 <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.Center)" Content="Center" />
                 <XButton Parent="PARENT" Clicked="(_, e) => SetHorizontalAlignment(Alignment.End)" Content="Right" />
             </StackPanel>
 
-            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1">
-                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150">VerticalAlignment:</TextBlock>
+            <StackPanel Parent="PARENT" Orientation="Horizontal" Margin="T(0,4,0,0)" Spacing="1.0">
+                <TextBlock Parent="PARENT" VerticalAlignment="Center" Width="150.0">VerticalAlignment:</TextBlock>
                 <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Stretch)" Content="Stretch" />
                 <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Start)" Content="Top" />
                 <XButton Parent="PARENT" Clicked="(_, e) => SetVerticalAlignment(Alignment.Center)" Content="Center" />
@@ -39,19 +39,23 @@
 
 @functions{
 
-    public string Title { get; set; }
+    [Parameter]
+    private string Title { get; set; }
 
-    public bool ShowOrientation { get; set; } = false;
+    [Parameter]
+    private bool ShowOrientation { get; set; } = false;
 
-    public bool ShowAlignment { get; set; } = true;
+    [Parameter]
+    private bool ShowAlignment { get; set; } = true;
+
+    [Parameter]
+    private Action Update { get; set; }
 
     public Orientation TheOrientation { get; private set; } = Orientation.Vertical;
 
     public Alignment TheHorizontalAlignment { get; private set; } = Alignment.Center;
 
     public Alignment TheVerticalAlignment { get; private set; } = Alignment.Center;
-
-    public Action Update { get; set; }
 
     private void SetHorizontalAlignment(Alignment alignment)
     {

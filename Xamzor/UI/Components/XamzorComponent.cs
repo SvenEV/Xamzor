@@ -13,7 +13,7 @@ namespace Xamzor.UI.Components
 
         public static readonly PropertyKey TagProperty = PropertyKey.Create<string, XamzorComponent>(nameof(Tag));
         public static readonly PropertyKey ParentProperty = PropertyKey.Create<XamzorComponent, XamzorComponent>(nameof(Parent));
-        public static readonly PropertyKey ChildContentProperty = PropertyKey.Create<RenderFragment, XamzorComponent>(nameof(Parent));
+        public static readonly PropertyKey ChildContentProperty = PropertyKey.Create<RenderFragment, XamzorComponent>(nameof(ChildContent));
 
         public readonly PropertyContainer Properties = new PropertyContainer();
         private readonly string _cssClasses;
@@ -54,12 +54,11 @@ namespace Xamzor.UI.Components
 
             IEnumerable<Type> GetBaseTypes(Type type)
             {
-                while (type != typeof(UIElement))
+                while (type != typeof(XamzorComponent))
                 {
                     yield return type;
                     type = type.BaseType;
                 }
-                yield return typeof(UIElement);
             }
         }
 

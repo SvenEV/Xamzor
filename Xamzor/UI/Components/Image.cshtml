@@ -6,13 +6,15 @@
 
 @functions{
 
-    public string Source { get; set; }
+        // TODO: StretchDirection is not yet supported
 
-    public bool IsDraggable { get; set; } = false;
+    public static readonly PropertyKey SourceProperty = PropertyKey.Create<string, Image>(nameof(Source));
+    public static readonly PropertyKey StretchProperty = PropertyKey.Create<ImageStretch, Image>(nameof(Stretch), ImageStretch.Uniform);
+    public static readonly PropertyKey StretchDirectionProperty = PropertyKey.Create<StretchDirection, Image>(nameof(StretchDirection), StretchDirection.Both);
 
-    public ImageStretch Stretch { get; set; } = ImageStretch.Uniform;
-
-    public StretchDirection StretchDirection { get; set; } = StretchDirection.Both;
+    [Parameter] protected string Source { get => Properties.Get<string>(SourceProperty); set => Properties.Set(SourceProperty, value); }
+    [Parameter] protected ImageStretch Stretch { get => Properties.Get<ImageStretch>(StretchProperty); set => Properties.Set(StretchProperty, value); }
+    [Parameter] protected StretchDirection StretchDirection { get => Properties.Get<StretchDirection>(StretchDirectionProperty); set => Properties.Set(StretchDirectionProperty, value); }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {

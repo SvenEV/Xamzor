@@ -1,20 +1,19 @@
-﻿@implements IDataTemplate<Index.ComponentGalleryItem>
+﻿@inherits DataTemplate
 
 <Grid Parent="PARENT" Background="white"
       Margin="T(60)" Padding="T(20)"
       RowDefinitions="@Rows("Auto", "*")">
 
     <TextBlock Parent="PARENT"
-               Text="@DataContext.Title"
+               Text="@_item.Title"
                Margin="T(0,0,0,12)"
-               FontSize="32"
+               FontSize="32.0"
                FontWeight="FontWeight.SemiBold" />
     
     <ContentControl Parent="PARENT" Row="1"
-                    ContentTemplate="@DataContext.View" />
+                    ContentTemplate="@_item.View" />
 </Grid>
 
 @functions{
-    public Index.ComponentGalleryItem DataContext { get; set; }
-    public UIElement Parent { get; set; }
+    private Index.ComponentGalleryItem _item => (Index.ComponentGalleryItem)base.DataContext;
 }

@@ -1,10 +1,5 @@
-﻿@implements IDataTemplate<object>
+﻿@inherits DataTemplate
 
 <TextBlock>
     Watch <a href="https://github.com/SvenEV/Xamzor">Xamzor on GitHub</a> for updates.
 </TextBlock>
-
-@functions{
-    public object DataContext { get; set; }
-    public UIElement Parent { get; set; }
-}

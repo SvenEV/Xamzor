@@ -4,10 +4,15 @@
 
 @functions{
 
-    [Parameter] protected Thickness BorderThickness { get; set; } = Thickness.Zero;
-    [Parameter] protected Thickness CornerRadius { get; set; } = Thickness.Zero;
-    [Parameter] protected string Background { get; set; }
-    [Parameter] protected string BorderBrush { get; set; }
+    public static readonly PropertyKey BorderThicknessProperty = PropertyKey.Create<Thickness, Border>(nameof(BorderThickness));
+    public static readonly PropertyKey CornerRadiusProperty = PropertyKey.Create<Thickness, Border>(nameof(CornerRadius));
+    public static readonly PropertyKey BackgroundProperty = PropertyKey.Create<string, Border>(nameof(Background));
+    public static readonly PropertyKey BorderBrushProperty = PropertyKey.Create<string, Border>(nameof(BorderBrush));
+
+    [Parameter] protected Thickness BorderThickness { get => Properties.Get<Thickness>(BorderThicknessProperty); set => Properties.Set(BorderThicknessProperty, value); }
+    [Parameter] protected Thickness CornerRadius { get => Properties.Get<Thickness>(CornerRadiusProperty); set => Properties.Set(CornerRadiusProperty, value); }
+    [Parameter] protected string Background { get => Properties.Get<string>(BackgroundProperty); set => Properties.Set(BackgroundProperty, value); }
+    [Parameter] protected string BorderBrush { get => Properties.Get<string>(BorderBrushProperty); set => Properties.Set(BorderBrushProperty, value); }
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {

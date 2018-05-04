@@ -16,8 +16,10 @@
 
 @functions{
 
+    public static readonly PropertyKey ClickedProperty = PropertyKey.Create<EventHandler<UIMouseEventArgs>, XButton>(nameof(Clicked));
+
     // This is a property because adding handlers to events via tag helpers doesn't seem to be supported yet
-    public EventHandler<UIMouseEventArgs> Clicked { get; set; }
+    [Parameter] protected EventHandler<UIMouseEventArgs> Clicked { get; set; }
 
     private void OnClicked(UIMouseEventArgs e) => Clicked?.Invoke(this, e);
 

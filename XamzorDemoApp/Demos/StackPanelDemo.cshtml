@@ -1,4 +1,4 @@
-﻿@implements IDataTemplate<object>
+﻿@inherits DataTemplate
 
 <Grid Parent="PARENT" ColumnDefinitions="@Columns("*", "*")">
 
@@ -22,19 +22,19 @@
             
             <Border Parent="PARENT"
                     Background="red"
-                    MinWidth="100" MinHeight="100"
+                    MinWidth="100.0" MinHeight="100.0"
                     HorizontalAlignment="_box1.TheHorizontalAlignment"
                     VerticalAlignment="_box1.TheVerticalAlignment" />
 
             <Border Parent="PARENT"
                     Background="yellow"
-                    MinWidth="150" MinHeight="50"
+                    MinWidth="150.0" MinHeight="50.0"
                     HorizontalAlignment="_box2.TheHorizontalAlignment"
                     VerticalAlignment="_box2.TheVerticalAlignment" />
             
             <Border Parent="PARENT"
                     Background="green"
-                    MinWidth="50" MinHeight="150"
+                    MinWidth="50.0" MinHeight="150.0"
                     HorizontalAlignment="_box3.TheHorizontalAlignment"
                     VerticalAlignment="_box3.TheVerticalAlignment" />
 
@@ -44,10 +44,6 @@
 </Grid>
 
 @functions{
-    public object DataContext { get; set; }
-
-    public UIElement Parent { get; set; }
-
     private LayoutController _stack;
     private LayoutController _box1;
     private LayoutController _box2;

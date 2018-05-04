@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Blazor;
+using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Blazor.RenderTree;
 using System;
 using System.Collections;
@@ -8,23 +9,42 @@ namespace Xamzor.UI.Components
 {
     public class ItemsControl : UIElement
     {
+        public static readonly PropertyKey ItemsProperty = PropertyKey.Create<IEnumerable, ItemsControl>(nameof(Items));
+        public static readonly PropertyKey ItemTemplateProperty = PropertyKey.Create<Type, ItemsControl>(nameof(ItemTemplate));
+        public static readonly PropertyKey ItemsPanelTemplateProperty = PropertyKey.Create<Type, ItemsControl>(nameof(ItemsPanelTemplate));
+
         /// <summary>
         /// The data items to display.
         /// </summary>
-        public IEnumerable Items { get; set; }
+        [Parameter]
+        protected IEnumerable Items
+        {
+            get => Properties.Get<IEnumerable>(ItemsProperty);
+            set => Properties.Set(ItemsProperty, value);
+        }
 
         /// <summary>
         /// The component type used to render each item. Should implement <see cref="IDataTemplate{T}"/>.
         /// If null, a string representation of each item is rendered using a <see cref="TextBlock"/>.
         /// </summary>
-        public Type ItemTemplate { get; set; }
+        [Parameter]
+        protected Type ItemTemplate
+        {
+            get => Properties.Get<Type>(ItemTemplateProperty);
+            set => Properties.Set(ItemTemplateProperty, value);
+        }
 
         /// <summary>
         /// The component type used to render the container panel for all items.
         /// If null, <see cref="ItemsControlDefaultItemsPanel"/> is used which
         /// renders a vertical stack of items.
         /// </summary>
-        public Type ItemsPanelTemplate { get; set; }
+        [Parameter]
+        protected Type ItemsPanelTemplate
+        {
+            get => Properties.Get<Type>(ItemsPanelTemplateProperty);
+            set => Properties.Set(ItemTemplateProperty, value);
+        }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -47,8 +67,8 @@ namespace Xamzor.UI.Components
         protected virtual void BuildItemsPanelRenderTree(RenderTreeBuilder builder, RenderFragment renderItems)
         {
             builder.OpenComponent(4, ItemsPanelTemplate ?? typeof(ItemsControlDefaultItemsPanel));
-            builder.AddAttribute(5, nameof(Parent), this);
-            builder.AddAttribute(6, nameof(ChildContent), renderItems);
+            builder.AddAttribute(5, ParentProperty.Name, this);
+            builder.AddAttribute(6, ChildContentProperty.Name, renderItems);
             builder.CloseComponent();
         }
 
@@ -61,15 +81,15 @@ namespace Xamzor.UI.Components
             if (ItemTemplate != null)
             {
                 builder.OpenComponent(0, ItemTemplate);
-                builder.AddAttribute(1, nameof(Parent), Helpers.PARENT);
-                builder.AddAttribute(2, nameof(IDataTemplate<object>.DataContext), item);
+                builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(2, DataTemplate.DataContextProperty.Name, item);
                 builder.CloseComponent();
             }
             else if (item != null)
             {
                 builder.OpenComponent<TextBlock>(3);
-                builder.AddAttribute(4, nameof(Parent), Helpers.PARENT);
-                builder.AddAttribute(5, nameof(TextBlock.Text), item?.ToString());
+                builder.AddAttribute(4, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(5, TextBlock.TextProperty.Name, item?.ToString());
                 builder.CloseComponent();
             }
         }

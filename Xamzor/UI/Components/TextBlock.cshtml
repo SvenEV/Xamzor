@@ -12,24 +12,26 @@
 
 @functions{
 
-    public string Foreground { get; set; } = "black";
+    public static readonly PropertyKey ForegroundProperty = PropertyKey.Create<string, TextBlock>(nameof(Foreground), "black");
+    public static readonly PropertyKey FontFamilyProperty = PropertyKey.Create<string, TextBlock>(nameof(FontFamily), "Segoe UI");
+    public static readonly PropertyKey FontSizeProperty = PropertyKey.Create<double, TextBlock>(nameof(FontSize), 16);
+    public static readonly PropertyKey FontWeightProperty = PropertyKey.Create<FontWeight, TextBlock>(nameof(FontWeight), FontWeight.Normal);
+    public static readonly PropertyKey FontStyleProperty = PropertyKey.Create<FontStyle, TextBlock>(nameof(FontStyle), FontStyle.Normal);
+    public static readonly PropertyKey TextWrappingProperty = PropertyKey.Create<TextWrapping, TextBlock>(nameof(TextWrapping), TextWrapping.WrapWholeWords);
+    public static readonly PropertyKey TextTrimmingProperty = PropertyKey.Create<TextTrimming, TextBlock>(nameof(TextTrimming), TextTrimming.None);
+    public static readonly PropertyKey IsTextSelectionEnabledProperty = PropertyKey.Create<bool, TextBlock>(nameof(IsTextSelectionEnabled), false);
+    public static readonly PropertyKey TextProperty = PropertyKey.Create<string, TextBlock>(nameof(Text));
 
-    public string FontFamily { get; set; } = "Segoe UI";
-
-    public double FontSize { get; set; } = 16;
-
-    public FontWeight FontWeight { get; set; } = FontWeight.Normal;
-
-    public FontStyle FontStyle { get; set; } = FontStyle.Normal;
-
-    public TextWrapping TextWrapping { get; set; } = TextWrapping.WrapWholeWords;
-
-    public TextTrimming TextTrimming { get; set; } = TextTrimming.None;
-
-    public bool IsTextSelectionEnabled { get; set; } = false;
-
-    public string Text { get; set; }
-
+    [Parameter] protected string Foreground { get => Properties.Get<string>(ForegroundProperty); set => Properties.Set(ForegroundProperty, value); }
+    [Parameter] protected string FontFamily { get => Properties.Get<string>(FontFamilyProperty); set => Properties.Set(FontFamilyProperty, value); }
+    [Parameter] protected double FontSize { get => Properties.Get<double>(FontSizeProperty); set => Properties.Set(FontSizeProperty, value); }
+    [Parameter] protected FontWeight FontWeight { get => Properties.Get<FontWeight>(FontWeightProperty); set => Properties.Set(FontWeightProperty, value); }
+    [Parameter] protected FontStyle FontStyle { get => Properties.Get<FontStyle>(FontStyleProperty); set => Properties.Set(FontStyleProperty, value); }
+    [Parameter] protected TextWrapping TextWrapping { get => Properties.Get<TextWrapping>(TextWrappingProperty); set => Properties.Set(TextWrappingProperty, value); }
+    [Parameter] protected TextTrimming TextTrimming { get => Properties.Get<TextTrimming>(TextTrimmingProperty); set => Properties.Set(TextTrimmingProperty, value); }
+    [Parameter] protected bool IsTextSelectionEnabled { get => Properties.Get<bool>(IsTextSelectionEnabledProperty); set => Properties.Set(IsTextSelectionEnabledProperty, value); }
+    [Parameter] protected string Text { get => Properties.Get<string>(TextProperty); set => Properties.Set(TextProperty, value); }
+    
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
         base.ComputeOwnLayoutCss(sb);
