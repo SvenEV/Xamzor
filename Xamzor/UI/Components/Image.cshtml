@@ -16,7 +16,7 @@
     [Parameter] protected ImageStretch Stretch { get => Properties.Get<ImageStretch>(StretchProperty); set => Properties.Set(StretchProperty, value); }
     [Parameter] protected StretchDirection StretchDirection { get => Properties.Get<StretchDirection>(StretchDirectionProperty); set => Properties.Set(StretchDirectionProperty, value); }
 
-    private Point _imageSize;
+    private Vector2 _imageSize;
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
@@ -38,7 +38,7 @@
     {
         await base.OnParametersSetAsync();
 
-        if (_imageSize != Point.Zero || string.IsNullOrWhiteSpace(Source))
+        if (_imageSize != Vector2.Zero || string.IsNullOrWhiteSpace(Source))
             return;
 
         _imageSize = await ImageMeasureInterop.MeasureImageAsync(Source);
@@ -107,7 +107,7 @@
 
 
 
-
+    /*
     protected override Point MeasureOverride(Point availableSize) =>
         MeasureArrange(availableSize);
 
@@ -162,4 +162,5 @@
 
         return scale;
     }
+    */
 }

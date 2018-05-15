@@ -21,4 +21,6 @@
         sb.Append($"scroll-snap-points-{(isHorizontal ? "x" : "y")}: repeat(100%); ");
         sb.Append($"-ms-scroll-snap-points-{(isHorizontal ? "x" : "y")}: snapInterval(0, 100%); ");
     }
+
+    protected override LayoutFunc ChildLayout => Layouts.Stack(Orientation, 0, Children.OfType<UIElement>().Select(child => child.Layout));
 }

@@ -39,7 +39,7 @@
         base.OnAfterRender();
     }
 
-    public void MeasureRoot()
+    public Vector2 MeasureRoot()
     {
         try
         {
@@ -47,19 +47,14 @@
             var sizeParts = sizeString.Split(',');
             Width = double.Parse(sizeParts[0]);
             Height = double.Parse(sizeParts[1]);
-            Measure(new Point(Width, Height));
+            return new Vector2(Width, Height);
         }
         catch (JavaScriptException)
         {
-            return; // Not yet rendered
+            return Vector2.Zero; // Not yet rendered
         }
     }
-
-    public void ArrangeRoot()
-    {
-        Arrange(new Rect(Point.Zero, DesiredSize));
-    }
-
+    
     public interface IXamzorViewOwner
     {
         void OnXamzorViewInitialized(XamzorView view);

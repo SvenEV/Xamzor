@@ -31,22 +31,8 @@
             sb.Append($"border-radius: {Css.FromThickness(CornerRadius)}; ");
     }
 
-    protected override Point MeasureOverride(Point availableSize)
-    {
-        var childSize = Children.OfType<UIElement>().FirstOrDefault()?
-            .Measure(availableSize - Padding.Size - BorderThickness.Size) ?? Point.Zero;
-
-        return childSize + Padding.Size + BorderThickness.Size;
-    }
-
-    protected override Point ArrangeOverride(Point finalSize)
-    {
-        // Note: Offset does not include BorderThickness.TopLeft as that is already
-        // accounted for by the HTML layout
-        Children.OfType<UIElement>().FirstOrDefault()?.Arrange(new Rect(
-            Padding.TopLeft,
-            finalSize - Padding.Size - BorderThickness.Size));
-
-        return finalSize;
-    }
+    // TODO: Offset should NOT include BorderThickness.TopLeft as that is already
+    // accounted for by the HTML layout. We might need a custom Inset()-function here.
+    protected override LayoutFunc ChildLayout =>
+        Layouts.Inset(BorderThickness, base.ChildLayout);
 }

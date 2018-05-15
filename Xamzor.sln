@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xamzor", "Xamzor\Xamzor.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XamzorDemoApp", "XamzorDemoApp\XamzorDemoApp.csproj", "{642EE41F-8A53-4956-AD93-485223901513}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Layman", "..\Layman\Layman\Layman.csproj", "{6F054E97-B49A-4DEA-ADAA-F9C3F0DB6482}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{642EE41F-8A53-4956-AD93-485223901513}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{642EE41F-8A53-4956-AD93-485223901513}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{642EE41F-8A53-4956-AD93-485223901513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F054E97-B49A-4DEA-ADAA-F9C3F0DB6482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F054E97-B49A-4DEA-ADAA-F9C3F0DB6482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F054E97-B49A-4DEA-ADAA-F9C3F0DB6482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F054E97-B49A-4DEA-ADAA-F9C3F0DB6482}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

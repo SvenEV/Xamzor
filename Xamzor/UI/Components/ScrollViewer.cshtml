@@ -67,33 +67,8 @@
             sb.Append($"max-height: none; ");
     }
 
-    protected override Point MeasureOverride(Point availableSize)
-    {
-        // Space in each direction is unlimited if scrolling is allowed
-        var childAvailableSize = new Point(
-            (HorizontalScrollMode == ScrollMode.Disabled) ? availableSize.X : double.PositiveInfinity,
-            (VerticalScrollMode == ScrollMode.Disabled) ? availableSize.Y : double.PositiveInfinity);
-
-        var childSize = Children.OfType<UIElement>().FirstOrDefault()?
-            .Measure(childAvailableSize) ?? Point.Zero;
-
-        return childSize;
-    }
-
-    protected override Point ArrangeOverride(Point finalSize)
-    {
-        if (Children.FirstOrDefault() is UIElement child)
-        {
-            // To prevent the child from applying clipping, we provide it the size it desires even
-            // if that exceeds the given finalSize. (With clipping, we wouldn't see any content when 
-            // scrolling beyond the initial scroll position.)
-            var arrangeSize = new Point(
-                (HorizontalScrollMode == ScrollMode.Disabled) ? finalSize.X : Math.Max(finalSize.X, child.DesiredSize.X),
-                (VerticalScrollMode == ScrollMode.Disabled) ? finalSize.Y : Math.Max(finalSize.Y, child.DesiredSize.Y));
-
-            child.Arrange(new Rect(Point.Zero, arrangeSize));
-        }
-
-        return finalSize;
-    }
+    protected override LayoutFunc ChildLayout => Layouts.Overflow(
+        HorizontalScrollMode != ScrollMode.Disabled,
+        VerticalScrollMode != ScrollMode.Disabled,
+        base.ChildLayout);
 }

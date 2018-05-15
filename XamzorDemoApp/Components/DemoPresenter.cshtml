@@ -11,10 +11,12 @@
                    Text="@_item.Title"
                    Margin="T(0,0,0,12)"
                    FontSize="32.0"
-                   FontWeight="FontWeight.SemiBold" />
+                   FontWeight="FontWeight.SemiBold"
+                   Tag="DemoTitle" />
 
         <ContentControl Parent="PARENT" Row="1"
-                        ContentTemplate="@_item.View" />
+                        ContentTemplate="@_item.View"
+                        Tag="DemoContent" />
     </Grid>
 
 </div>

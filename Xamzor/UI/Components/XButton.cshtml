@@ -36,15 +36,5 @@
         sb.Append("text-align: left; ");
     }
 
-    protected override Point MeasureOverride(Point availableSize)
-    {
-        var border = new Point(4, 4);
-        return base.MeasureOverride(availableSize - border) + border;
-    }
-
-    protected override Point ArrangeOverride(Point finalSize)
-    {
-        var border = new Point(4, 4);
-        return base.ArrangeOverride(finalSize - border) + border;
-    }
+    protected override LayoutFunc ChildLayout => Layouts.Inset(new Thickness(2), base.ChildLayout);
 }

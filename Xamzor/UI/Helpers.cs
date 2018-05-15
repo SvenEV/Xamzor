@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Layman;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xamzor.UI.Components;
@@ -26,11 +27,11 @@ namespace Xamzor.UI
         // HACK
         public static XamzorComponent PARENT { get; set; }
 
-        public static IReadOnlyList<RowDefinition> Rows(params string[] sizeStrings) =>
-            sizeStrings.Select(s => new RowDefinition(GridLength.Parse(s))).ToList();
+        public static IReadOnlyList<GridTrackDefinition> Rows(params string[] sizeStrings) =>
+            sizeStrings.Select(s => new GridTrackDefinition(GridLength.Parse(s))).ToList();
 
-        public static IReadOnlyList<ColumnDefinition> Columns(params string[] sizeStrings) =>
-            sizeStrings.Select(s => new ColumnDefinition(GridLength.Parse(s))).ToList();
+        public static IReadOnlyList<GridTrackDefinition> Columns(params string[] sizeStrings) =>
+            sizeStrings.Select(s => new GridTrackDefinition(GridLength.Parse(s))).ToList();
 
         public static double Clamp(double value, double min, double max) =>
             value < min ? min : (value > max ? max : value);

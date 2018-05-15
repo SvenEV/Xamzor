@@ -32,6 +32,21 @@
     [Parameter] protected bool IsTextSelectionEnabled { get => Properties.Get<bool>(IsTextSelectionEnabledProperty); set => Properties.Set(IsTextSelectionEnabledProperty, value); }
     [Parameter] protected string Text { get => Properties.Get<string>(TextProperty); set => Properties.Set(TextProperty, value); }
 
+    protected override LayoutFunc ChildLayout => context =>
+    {
+        switch (context.Phase)
+        {
+            case LayoutPhase.Measure:
+                return MeasureOverride(context.Space);
+
+            case LayoutPhase.Arrange:
+                return base.ChildLayout(context);
+
+            default:
+                throw new NotImplementedException();
+        }
+    };
+
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
         base.ComputeOwnLayoutCss(sb);
@@ -62,10 +77,10 @@
             sb.Append("user-select: none; -ms-user-select: none; cursor: default; ");
     }
 
-    protected override Point MeasureOverride(Point availableSize)
+    private Vector2 MeasureOverride(Vector2 availableSize)
     {
         if (Text == null && ChildContent == null)
-            return Point.Zero;
+            return Vector2.Zero;
 
         // TODO: How to measure ChildContent?
 
@@ -74,7 +89,7 @@
 
         var sizeParts = sizeString.Split(',');
 
-        var size = Point.Min(availableSize, new Point(
+        var size = Vector2.Min(availableSize, new Vector2(
             double.Parse(sizeParts[0]),
             double.Parse(sizeParts[1])));
 

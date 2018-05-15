@@ -6,21 +6,16 @@
 
 @functions{
 
-    private static readonly GridSpan[] DefaultGridSpans = new[] { new GridSpan(new GridLength(1, GridUnitType.Star), 0, double.PositiveInfinity) };
-
     public static readonly PropertyKey RowProperty = PropertyKey.Create<int, Grid>(nameof(Row), 0);
     public static readonly PropertyKey ColumnProperty = PropertyKey.Create<int, Grid>(nameof(Column), 0);
     public static readonly PropertyKey RowSpanProperty = PropertyKey.Create<int, Grid>(nameof(RowSpan), 1);
     public static readonly PropertyKey ColumnSpanProperty = PropertyKey.Create<int, Grid>(nameof(ColumnSpan), 1);
 
-    [Parameter] protected IReadOnlyList<RowDefinition> RowDefinitions { get; set; }
-    [Parameter] protected IReadOnlyList<ColumnDefinition> ColumnDefinitions { get; set; }
+    [Parameter] protected IReadOnlyList<GridTrackDefinition> RowDefinitions { get; set; }
+    [Parameter] protected IReadOnlyList<GridTrackDefinition> ColumnDefinitions { get; set; }
     [Parameter] protected double RowSpacing { get; set; } = 0;
     [Parameter] protected double ColumnSpacing { get; set; } = 0;
     [Parameter] protected string Background { get; set; } = "transparent";
-
-    private GridSpan[] _rows;
-    private GridSpan[] _cols;
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
@@ -30,169 +25,13 @@
             sb.Append($"background-color: {Background}; ");
     }
 
-    protected override Point MeasureOverride(Point availableSize)
-    {
-        var rows = (RowDefinitions?.Count > 0)
-            ? RowDefinitions?.Select(def => new GridSpan(def.Height, def.MinHeight, def.MaxHeight)).ToArray()
-            : DefaultGridSpans;
-
-        var cols = (ColumnDefinitions?.Count > 0)
-            ? ColumnDefinitions?.Select(def => new GridSpan(def.Width, def.MinWidth, def.MaxWidth)).ToArray()
-            : DefaultGridSpans;
-
-        var spans = new[] { cols, rows };
-
-        var remainingSpace = availableSize - Padding.Size;
-
-        void ReduceRemainingSpace(int dim, double reduction) => remainingSpace = new Point(
-            dim == 0 ? Max(0, remainingSpace.X - reduction) : remainingSpace.X,
-            dim == 1 ? Max(0, remainingSpace.Y - reduction) : remainingSpace.Y);
-
-        // First, initialize span sizes with defined minimum sizes
-        for (var dim = 0; dim <= 1; dim++)
-        {
-            foreach (var span in spans[dim])
-            {
-                span.ComputedSize = span.DefinedMinSize; // can't get any smaller, if necessary the Grid is clipped instead
-                ReduceRemainingSpace(dim, span.DefinedMinSize);
-            }
-        }
-
-        // Then, assign size of fixed-size spans
-        for (var dim = 0; dim <= 1; dim++)
-        {
-            foreach (var span in spans[dim].Where(s => s.DefinedSize.IsAbsolute))
-            {
-                var size = Min(Clamp(span.DefinedSize.Value, span.DefinedMinSize, span.DefinedMaxSize), remainingSpace[dim]);
-                span.ComputedSize = size;
-                ReduceRemainingSpace(dim, size - span.DefinedMinSize);
-            }
-        }
-
-        // Next, measure children (provide them with sizes of covered fixed-size spans [+ remainingWidth if auto/star spans are covered])
-        foreach (UIElement child in Children)
-        {
-            var area = GetCoveredArea(child);
-            var coveredCols = cols.Skip(area.X).Take(area.Width);
-            var coveredRows = rows.Skip(area.Y).Take(area.Height);
-
-            var coveredFixedWidth = coveredCols.Where(s => s.DefinedSize.IsAbsolute).Sum(s => s.ComputedSize);
-            var coveredFixedHeight = coveredRows.Where(s => s.DefinedSize.IsAbsolute).Sum(s => s.ComputedSize);
-
-            var providedWidth = coveredFixedWidth + (coveredCols.All(s => s.DefinedSize.IsAbsolute) ? 0 : remainingSpace.X);
-            var providedHeight = coveredFixedHeight + (coveredRows.All(s => s.DefinedSize.IsAbsolute) ? 0 : remainingSpace.Y);
-
-            child.Measure(new Point(providedWidth, providedHeight));
-            var childMeasuredSize = child.DesiredSize;
-
-            // Child first fills up space of covered fixed-size spans. If that's not enough, enlarge covered auto-sized spans from left-to-right/top-to-bottom.
-            var coveredSpans = new[] { coveredCols, coveredRows };
-            var coveredFixedSpace = new[] { coveredFixedWidth, coveredFixedHeight };
-
-            for (var dim = 0; dim <= 1; dim++)
-            {
-                var spaceNotAssignableToFixedSizeSpans = Max(0, childMeasuredSize[dim] - coveredFixedSpace[dim]); // to be distributed among covered auto/star spans
-                var coveredAutoSpans = coveredSpans[dim].Where(s => s.DefinedSize.IsAuto);
-
-                // Child covers auto-sized spans, so one of these (or multiple together) may provide the remaining space to distribute.
-                // We try to assign the required space to the first auto-sized span. If that doesn't suffice (because of its defined max size),
-                // assign space to the next auto-sized span etc., until (A) space has been fully assigned, (B) we run out of total space for the grid,
-                // or (C) all covered spans have been filled up.
-                var remainingSpaceToDistribute = spaceNotAssignableToFixedSizeSpans;
-
-                foreach (var autoSpan in coveredAutoSpans)
-                {
-                    // if all of the required space has been distributed (case A), the remaining covered spans are not needed and can be skipped
-                    if (remainingSpaceToDistribute <= 0)
-                        break;
-
-                    var enlargement = Clamp(remainingSpaceToDistribute - autoSpan.ComputedSize, 0, autoSpan.DefinedMaxSize - autoSpan.ComputedSize);
-                    enlargement = Min(enlargement, remainingSpace[dim]); // if overall remaining space doesn't suffice, grid content gets clipped
-                    autoSpan.ComputedSize += enlargement;
-                    ReduceRemainingSpace(dim, enlargement);
-                    remainingSpaceToDistribute -= enlargement;
-                }
-            }
-        }
-
-        // If any space is left, distribute it among star-sized spans
-        for (var dim = 0; dim <= 1; dim++)
-        {
-            var starSpans = spans[dim].Where(s => s.DefinedSize.IsStar);
-            var numStars = starSpans.Sum(span => span.DefinedSize.Value);
-            var sizePerStar = remainingSpace[dim] / numStars;
-
-            foreach (var span in starSpans)
-            {
-                span.ComputedSize = Clamp(span.DefinedSize.Value * sizePerStar, span.DefinedMinSize, span.DefinedMaxSize);
-                ReduceRemainingSpace(dim, span.ComputedSize - span.DefinedMinSize);
-
-                // due to defined max size, span might not be able to be as large as its star size suggests
-                // so we have to recalculate the size of a star
-                // (alternative: keep the star size! In this case, Grid may not take up all the available space, though)
-                numStars -= span.DefinedSize.Value;
-                sizePerStar = remainingSpace[dim] / numStars;
-            }
-        }
-
-        _rows = rows;
-        _cols = cols;
-
-        return availableSize - remainingSpace + Padding.Size;
-    }
-
-    protected override Point ArrangeOverride(Point finalSize)
-    {
-        // Problem: Assumes that finalSize is the same as Measure()-input
-
-        foreach (UIElement child in Children)
-        {
-            var area = GetCoveredArea(child);
-            var offsetX = _cols.Take(area.X).Sum(s => s.ComputedSize);
-            var offsetY = _rows.Take(area.Y).Sum(s => s.ComputedSize);
-            var sizeX = Min(finalSize.X, _cols.Skip(area.X).Take(area.Width).Sum(s => s.ComputedSize));
-            var sizeY = Min(finalSize.Y, _rows.Skip(area.Y).Take(area.Height).Sum(s => s.ComputedSize));
-            child.Arrange(new Rect(offsetX + Padding.Left, offsetY + Padding.Top, sizeX, sizeY));
-        }
-
-        return finalSize;
-    }
-
-    private static IntRect GetCoveredArea(UIElement e) => new IntRect(
-        e.Properties.Get<int>(Grid.ColumnProperty),
-        e.Properties.Get<int>(Grid.RowProperty),
-        e.Properties.Get<int>(Grid.ColumnSpanProperty),
-        e.Properties.Get<int>(Grid.RowSpanProperty));
-
-    class GridSpan
-    {
-        public GridLength DefinedSize { get; }
-        public double DefinedMinSize { get; }
-        public double DefinedMaxSize { get; }
-        public double ComputedSize { get; set; }
-
-        public GridSpan(GridLength definedSize, double definedMinSize, double definedMaxSize)
-        {
-            DefinedSize = definedSize;
-            DefinedMinSize = definedMinSize;
-            DefinedMaxSize = definedMaxSize;
-            ComputedSize = double.NaN;
-        }
-    }
-
-    struct IntRect
-    {
-        public int X { get; }
-        public int Y { get; }
-        public int Width { get; }
-        public int Height { get; }
-
-        public IntRect(int x, int y, int width, int height) : this()
-        {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-        }
-    }
+    protected override LayoutFunc ChildLayout => Layouts.Grid(
+        RowDefinitions,
+        ColumnDefinitions,
+        Children.OfType<UIElement>().Select(child => new GridItem(
+            child.Layout,
+            child.Properties.Get<int>(RowProperty),
+            child.Properties.Get<int>(ColumnProperty),
+            child.Properties.Get<int>(RowSpanProperty),
+            child.Properties.Get<int>(ColumnSpanProperty))));
 }

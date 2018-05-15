@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Layman;
+using System.Collections.Generic;
 using Xamzor.UI.Components;
 
 namespace Xamzor.UI
 {
     public class LayoutManager
     {
+        private readonly ConsoleTraceWriter _traceWriter = new ConsoleTraceWriter();
         private readonly Queue<UIElement> _toMeasure = new Queue<UIElement>();
         private readonly Queue<UIElement> _toArrange = new Queue<UIElement>();
         private bool _queued;
@@ -77,7 +79,7 @@ namespace Xamzor.UI
             {
                 var control = _toMeasure.Dequeue();
 
-                if (!control.IsMeasureValid)
+                if (!control.LayoutCache.IsMeasureValid)
                     Measure(control);
             }
         }
@@ -88,7 +90,7 @@ namespace Xamzor.UI
             {
                 var control = _toArrange.Dequeue();
 
-                if (!control.IsArrangeValid)
+                if (!control.LayoutCache.IsArrangeValid)
                     Arrange(control);
             }
         }
@@ -107,18 +109,16 @@ namespace Xamzor.UI
             // If the control being measured has IsMeasureValid == true here then its measure was
             // handed by an ancestor and can be ignored. The measure may have also caused the
             // control to be removed.
-            if (!control.IsMeasureValid)
+            if (!control.LayoutCache.IsMeasureValid)
             {
                 UILog.Write("LAYMAN", $"Measuring '{control}'");
 
-                if (control is XamzorView root)
-                {
-                    root.MeasureRoot();
-                }
-                else
-                {
-                    control.Measure(control.PreviousMeasureInput.Value);
-                }
+                var space = (control is XamzorView root)
+                    ? root.MeasureRoot()
+                    : control.LayoutCache.PreviousMeasureInput.Value;
+
+                var context = LayoutContext.CreateForMeasure(space, _traceWriter);
+                control.Layout(context);
             }
         }
 
@@ -131,20 +131,16 @@ namespace Xamzor.UI
                 Arrange(parent);
             }
 
-            if (!control.IsArrangeValid)
+            if (!control.LayoutCache.IsArrangeValid)
             {
                 UILog.Write("LAYMAN", $"Arranging '{control}'");
 
-                if (control is XamzorView root)
-                {
-                    root.ArrangeRoot();
-                }
-                else if (control.PreviousArrangeInput != null)
-                {
-                    // Has been observed that PreviousArrange sometimes is null, probably a bug somewhere else.
-                    // Condition observed: control.VisualParent is Scrollbar, control is Border.
-                    control.Arrange(control.PreviousArrangeInput.Value);
-                }
+                var rect = (control is XamzorView root)
+                    ? new Rect(Vector2.Zero, root.LayoutCache.DesiredSize)
+                    : control.LayoutCache.PreviousArrangeInput.Value;
+
+                var context = LayoutContext.CreateForArrange(rect, _traceWriter);
+                control.Layout(context);
             }
         }
 
