@@ -1,47 +1,51 @@
 ﻿@inherits DataTemplate
 
-<Grid Parent="PARENT" ColumnDefinitions="@Columns("*", "*")">
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
+    
+    <Grid Parent="this" ColumnDefinitions="@Columns("*", "*")">
 
-    <StackPanel Parent="PARENT">
-        <LayoutController Update="StateHasChanged" Title="StackPanel" Ref="_stack"
-                            ShowOrientation="true" />
+        <StackPanel Parent="PARENT">
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="StackPanel" Ref="_stack"
+                              ShowOrientation="true" />
 
-        <LayoutController Update="StateHasChanged" Title="Red Box" Ref="_box1" />
-        <LayoutController Update="StateHasChanged" Title="Yellow Box" Ref="_box2" />
-        <LayoutController Update="StateHasChanged" Title="Green Box" Ref="_box3" />
-    </StackPanel>
-
-    <Border Parent="PARENT"
-            Column="1"
-            BorderBrush="black"
-            BorderThickness="T(2)">
-
-        <StackPanel Parent="PARENT" Orientation="_stack.TheOrientation"
-                    HorizontalAlignment="_stack.TheHorizontalAlignment"
-                    VerticalAlignment="_stack.TheVerticalAlignment">
-            
-            <Border Parent="PARENT"
-                    Background="red"
-                    MinWidth="100.0" MinHeight="100.0"
-                    HorizontalAlignment="_box1.TheHorizontalAlignment"
-                    VerticalAlignment="_box1.TheVerticalAlignment" />
-
-            <Border Parent="PARENT"
-                    Background="yellow"
-                    MinWidth="150.0" MinHeight="50.0"
-                    HorizontalAlignment="_box2.TheHorizontalAlignment"
-                    VerticalAlignment="_box2.TheVerticalAlignment" />
-            
-            <Border Parent="PARENT"
-                    Background="green"
-                    MinWidth="50.0" MinHeight="150.0"
-                    HorizontalAlignment="_box3.TheHorizontalAlignment"
-                    VerticalAlignment="_box3.TheVerticalAlignment" />
-
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Red Box" Ref="_box1" />
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Yellow Box" Ref="_box2" />
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Green Box" Ref="_box3" />
         </StackPanel>
-    </Border>
 
-</Grid>
+        <Border Parent="PARENT"
+                Column="1"
+                BorderBrush="black"
+                BorderThickness="T(2)">
+
+            <StackPanel Parent="PARENT" Orientation="_stack.TheOrientation"
+                        HorizontalAlignment="_stack.TheHorizontalAlignment"
+                        VerticalAlignment="_stack.TheVerticalAlignment">
+
+                <Border Parent="PARENT"
+                        Background="red"
+                        MinWidth="100.0" MinHeight="100.0"
+                        HorizontalAlignment="_box1.TheHorizontalAlignment"
+                        VerticalAlignment="_box1.TheVerticalAlignment" />
+
+                <Border Parent="PARENT"
+                        Background="yellow"
+                        MinWidth="150.0" MinHeight="50.0"
+                        HorizontalAlignment="_box2.TheHorizontalAlignment"
+                        VerticalAlignment="_box2.TheVerticalAlignment" />
+
+                <Border Parent="PARENT"
+                        Background="green"
+                        MinWidth="50.0" MinHeight="150.0"
+                        HorizontalAlignment="_box3.TheHorizontalAlignment"
+                        VerticalAlignment="_box3.TheVerticalAlignment" />
+
+            </StackPanel>
+        </Border>
+
+    </Grid>
+
+</div>
 
 @functions{
     private LayoutController _stack;

@@ -54,6 +54,7 @@ namespace Xamzor.UI.Components
             builder.AddAttribute(1, "id", Id);
             builder.AddAttribute(2, "class", CssClass);
             builder.AddAttribute(3, "style", LayoutCss);
+            builder.AddElementReferenceCapture(4, r => LayoutRoot = r);
 
             BuildItemsPanelRenderTree(builder, innerBuilder =>
             {
@@ -66,9 +67,9 @@ namespace Xamzor.UI.Components
 
         protected virtual void BuildItemsPanelRenderTree(RenderTreeBuilder builder, RenderFragment renderItems)
         {
-            builder.OpenComponent(4, ItemsPanelTemplate ?? typeof(ItemsControlDefaultItemsPanel));
-            builder.AddAttribute(5, ParentProperty.Name, this);
-            builder.AddAttribute(6, ChildContentProperty.Name, renderItems);
+            builder.OpenComponent(5, ItemsPanelTemplate ?? typeof(ItemsControlDefaultItemsPanel));
+            builder.AddAttribute(6, ParentProperty.Name, this);
+            builder.AddAttribute(7, ChildContentProperty.Name, renderItems);
             builder.CloseComponent();
         }
 
@@ -80,16 +81,16 @@ namespace Xamzor.UI.Components
         {
             if (ItemTemplate != null)
             {
-                builder.OpenComponent(0, ItemTemplate);
-                builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
-                builder.AddAttribute(2, DataTemplate.DataContextProperty.Name, item);
+                builder.OpenComponent(8, ItemTemplate);
+                builder.AddAttribute(9, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(10, DataTemplate.DataContextProperty.Name, item);
                 builder.CloseComponent();
             }
             else if (item != null)
             {
                 builder.OpenComponent<TextBlock>(3);
-                builder.AddAttribute(4, ParentProperty.Name, Helpers.PARENT);
-                builder.AddAttribute(5, TextBlock.TextProperty.Name, item?.ToString());
+                builder.AddAttribute(11, ParentProperty.Name, Helpers.PARENT);
+                builder.AddAttribute(12, TextBlock.TextProperty.Name, item?.ToString());
                 builder.CloseComponent();
             }
         }

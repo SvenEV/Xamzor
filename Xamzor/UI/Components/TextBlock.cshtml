@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss">@if (Text != null)
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">@if (Text != null)
     {
         @Text
     }
@@ -31,7 +31,7 @@
     [Parameter] protected TextTrimming TextTrimming { get => Properties.Get<TextTrimming>(TextTrimmingProperty); set => Properties.Set(TextTrimmingProperty, value); }
     [Parameter] protected bool IsTextSelectionEnabled { get => Properties.Get<bool>(IsTextSelectionEnabledProperty); set => Properties.Set(IsTextSelectionEnabledProperty, value); }
     [Parameter] protected string Text { get => Properties.Get<string>(TextProperty); set => Properties.Set(TextProperty, value); }
-    
+
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
         base.ComputeOwnLayoutCss(sb);
@@ -60,5 +60,26 @@
 
         if (!IsTextSelectionEnabled)
             sb.Append("user-select: none; -ms-user-select: none; cursor: default; ");
+    }
+
+    protected override Point MeasureOverride(Point availableSize)
+    {
+        if (Text == null && ChildContent == null)
+            return Point.Zero;
+
+        // TODO: How to measure ChildContent?
+
+        var sizeString = RegisteredFunction.Invoke<string>("Xamzor.measureHtml",
+            $"<div style=\"{StyleCss} max-width: {availableSize.X}px; max-height: {availableSize.Y}px;\">{Text}</div>");
+
+        var sizeParts = sizeString.Split(',');
+
+        var size = Point.Min(availableSize, new Point(
+            double.Parse(sizeParts[0]),
+            double.Parse(sizeParts[1])));
+
+        UILog.Write("TEXT", $"Measured a size of {size} for text '{Text}'");
+
+        return size;
     }
 }

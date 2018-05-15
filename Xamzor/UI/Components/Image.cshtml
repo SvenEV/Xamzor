@@ -1,12 +1,12 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss">
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
     <img style="@InnerCss" src="@Source" onerror="this.style.display = 'none'" />
 </div>
 
 @functions{
 
-        // TODO: StretchDirection is not yet supported
+    // TODO: StretchDirection is not yet supported
 
     public static readonly PropertyKey SourceProperty = PropertyKey.Create<string, Image>(nameof(Source));
     public static readonly PropertyKey StretchProperty = PropertyKey.Create<ImageStretch, Image>(nameof(Stretch), ImageStretch.Uniform);
@@ -15,6 +15,8 @@
     [Parameter] protected string Source { get => Properties.Get<string>(SourceProperty); set => Properties.Set(SourceProperty, value); }
     [Parameter] protected ImageStretch Stretch { get => Properties.Get<ImageStretch>(StretchProperty); set => Properties.Set(StretchProperty, value); }
     [Parameter] protected StretchDirection StretchDirection { get => Properties.Get<StretchDirection>(StretchDirectionProperty); set => Properties.Set(StretchDirectionProperty, value); }
+
+    private Point _imageSize;
 
     protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
     {
@@ -30,6 +32,17 @@
         sb.Append($"background-image: url({Source}); ");
         sb.Append($"background-size: {size}; ");
         sb.Append($"background-position: {AlignmentToPosition(HorizontalAlignment)} {AlignmentToPosition(VerticalAlignment)}; ");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (_imageSize != Point.Zero || string.IsNullOrWhiteSpace(Source))
+            return;
+
+        _imageSize = await ImageMeasureInterop.MeasureImageAsync(Source);
+        InvalidateMeasure();
     }
 
     private string InnerCss
@@ -90,4 +103,63 @@
 
     // TODO: 'Stretch' behavior does not match XAML 100%. If image fits into space, centering (50%) is correct.
     // If image exceeds available space, XAML aligns at start instead of center.
+
+
+
+
+
+    protected override Point MeasureOverride(Point availableSize) =>
+        MeasureArrange(availableSize);
+
+    protected override Point ArrangeOverride(Point finalSize) =>
+        MeasureArrange(finalSize);
+
+    private Point MeasureArrange(Point availableSize)
+    {
+        var scaleFactor = ComputeScaleFactor(availableSize, _imageSize, Stretch, StretchDirection);
+        return _imageSize * scaleFactor;
+    }
+
+    private static Point ComputeScaleFactor(Point availableSize, Point contentSize, ImageStretch stretch, StretchDirection stretchDirection)
+    {
+        var scale = Point.One;
+        var isWidthConstrained = !double.IsPositiveInfinity(availableSize.X);
+        var isHeightConstrained = !double.IsPositiveInfinity(availableSize.Y);
+
+        if (stretch != ImageStretch.None && (isWidthConstrained || isHeightConstrained))
+        {
+            scale = new Point(
+                Helpers.EqualsApprox(0, contentSize.X) ? 0 : availableSize.X / contentSize.X,
+                Helpers.EqualsApprox(0, contentSize.Y) ? 0 : availableSize.Y / contentSize.Y);
+
+            if (!isWidthConstrained)
+            {
+                scale = scale.WithX(scale.Y);
+            }
+            else if (!isHeightConstrained)
+            {
+                scale = scale.WithY(scale.X);
+            }
+            else
+            {
+                switch (stretch)
+                {
+                    case ImageStretch.Uniform:
+                        scale = Math.Min(scale.X, scale.Y) * Point.One;
+                        break;
+
+                    case ImageStretch.UniformToFill:
+                        scale = Math.Max(scale.X, scale.Y) * Point.One;
+                        break;
+                }
+            }
+
+            // Account for stretch direction
+            var minScale = (stretchDirection == StretchDirection.UpOnly) ? Point.One : Point.Zero;
+            var maxScale = (stretchDirection == StretchDirection.DownOnly) ? Point.One : Point.PositiveInfinity;
+            scale = Point.Clamp(scale, minScale, maxScale);
+        }
+
+        return scale;
+    }
 }

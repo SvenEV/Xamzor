@@ -3,7 +3,7 @@ using Xamzor.UI.Components;
 
 namespace Xamzor.UI
 {
-    public class DataTemplate : XamzorComponent
+    public class DataTemplate : UIElement
     {
         public static readonly PropertyKey DataContextProperty = PropertyKey.Create<object, DataTemplate>(nameof(DataContext));
         

@@ -5,11 +5,9 @@
 }
 
 .UIElement {
-    display: grid;
     overflow: hidden;
-    position: relative; /* fixes element stacking (z-index) issues */
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr;
+    position: absolute;
+    box-sizing: border-box;
 }
 
 .UIElement.TextBlock {

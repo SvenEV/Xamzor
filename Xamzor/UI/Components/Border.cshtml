@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss">@ChildContent</div>
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">@ChildContent</div>
 
 @functions{
 
@@ -25,9 +25,28 @@
             sb.Append($"border-color: {BorderBrush}; ");
 
         if (BorderThickness != Thickness.Zero)
-            sb.Append($"border-width: {ThicknessToCss(BorderThickness)}; border-style: solid;");
+            sb.Append($"border-width: {Css.FromThickness(BorderThickness)}; border-style: solid;");
 
         if (CornerRadius != Thickness.Zero)
-            sb.Append($"border-radius: {ThicknessToCss(CornerRadius)}; ");
+            sb.Append($"border-radius: {Css.FromThickness(CornerRadius)}; ");
+    }
+
+    protected override Point MeasureOverride(Point availableSize)
+    {
+        var childSize = Children.OfType<UIElement>().FirstOrDefault()?
+            .Measure(availableSize - Padding.Size - BorderThickness.Size) ?? Point.Zero;
+
+        return childSize + Padding.Size + BorderThickness.Size;
+    }
+
+    protected override Point ArrangeOverride(Point finalSize)
+    {
+        // Note: Offset does not include BorderThickness.TopLeft as that is already
+        // accounted for by the HTML layout
+        Children.OfType<UIElement>().FirstOrDefault()?.Arrange(new Rect(
+            Padding.TopLeft,
+            finalSize - Padding.Size - BorderThickness.Size));
+
+        return finalSize;
     }
 }

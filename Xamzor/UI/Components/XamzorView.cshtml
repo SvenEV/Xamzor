@@ -1,28 +1,65 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass"
-     style="position: absolute; width: 100%; height: 100%; display: grid;">
-    
+<div id="@Id" class="@CssClass" style="@Css" ref="LayoutRoot">
     @ChildContent
-    
-    @if (Application.IsDebugOutlineEnabled)
-    {
-        <button onclick="@(e => StateHasChanged())" style="position: absolute; left: 0px; top: 64px; opacity: 0.3;">
-            Refresh
-        </button>
-    }
 </div>
 
 @functions{
+
+    private string Css => "display: grid; position: absolute; width: 100%; height: 100%;";
 
     public IXamzorViewOwner Owner { get; set; }
 
     protected override void OnInit()
     {
         base.OnInit();
+
+        Application.WindowResized += () =>
+        {
+            InvalidateMeasure();
+            LayoutManager.Instance.RunQueuedLayoutPass();
+        };
+        
         Owner?.OnXamzorViewInitialized(this);
     }
-    
+
+    protected override void OnAfterRender()
+    {
+        if (!IsRealized)
+        {
+            // Rendering for the first time
+            LayoutManager.Instance.ExecuteInitialLayoutPass(this);
+            LayoutManager.Instance.InvalidateMeasure(this);
+
+            // TODO: Calling StateHasChanged() in OnAfterRender() breaks rendering.
+            //       Maybe we should report this?
+            //StateHasChanged();
+        }
+
+        base.OnAfterRender();
+    }
+
+    public void MeasureRoot()
+    {
+        try
+        {
+            var sizeString = RegisteredFunction.Invoke<string>("Xamzor.getSize", LayoutRoot);
+            var sizeParts = sizeString.Split(',');
+            Width = double.Parse(sizeParts[0]);
+            Height = double.Parse(sizeParts[1]);
+            Measure(new Point(Width, Height));
+        }
+        catch (JavaScriptException)
+        {
+            return; // Not yet rendered
+        }
+    }
+
+    public void ArrangeRoot()
+    {
+        Arrange(new Rect(Point.Zero, DesiredSize));
+    }
+
     public interface IXamzorViewOwner
     {
         void OnXamzorViewInitialized(XamzorView view);

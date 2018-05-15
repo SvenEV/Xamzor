@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass @(IsActive ? "active" : "")" style="@LayoutCss">
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
     @for (var i = 0; i < 6; i++)
     {
         <div><div style="background-color: @Foreground"></div></div>
@@ -11,7 +11,9 @@
 
     public static readonly PropertyKey IsActiveProperty = PropertyKey.Create<bool, ProgressRing>(nameof(IsActive));
 
-    [Parameter]
+    protected override string CssClass => base.CssClass + (IsActive? " active" : "");
+
+        [Parameter]
     protected bool IsActive
     {
         get => Properties.Get<bool>(IsActiveProperty);

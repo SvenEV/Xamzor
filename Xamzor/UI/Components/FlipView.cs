@@ -15,15 +15,15 @@ namespace Xamzor.UI.Components
             builder.CloseComponent();
         }
 
-        protected override void BuildItemRenderTree(RenderTreeBuilder builder, object item)
-        {
-            // Each item is wrapped in a horizontally & vertically stretching Border
-            // to ensure that it covers 100% of the FlipView rect
-            builder.OpenComponent<Border>(0);
-            builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
-            builder.AddAttribute(2, ChildContentProperty.Name, 
-                (RenderFragment)(innerBuilder => base.BuildItemRenderTree(innerBuilder, item)));
-            builder.CloseComponent();
-        }
+        //protected override void BuildItemRenderTree(RenderTreeBuilder builder, object item)
+        //{
+        //    // Each item is wrapped in a horizontally & vertically stretching Border
+        //    // to ensure that it covers 100% of the FlipView rect
+        //    builder.OpenComponent<Border>(0);
+        //    builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
+        //    builder.AddAttribute(2, ChildContentProperty.Name, 
+        //        (RenderFragment)(innerBuilder => base.BuildItemRenderTree(innerBuilder, item)));
+        //    builder.CloseComponent();
+        //}
     }
 }

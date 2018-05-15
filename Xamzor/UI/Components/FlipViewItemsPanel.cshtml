@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss">
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
     @ChildContent
 </div>
 
@@ -16,8 +16,6 @@
         base.ComputeOwnLayoutCss(sb);
 
         var isHorizontal = Orientation == Orientation.Horizontal;
-        sb.Append($"grid-auto-flow: {(isHorizontal ? "column" : "row")}; ");
-        sb.Append($"grid-auto-{(isHorizontal ? "columns" : "rows")}: 100%; ");
         sb.Append($"overflow-{(isHorizontal ? "x" : "y")}: scroll; ");
 
         sb.Append($"scroll-snap-points-{(isHorizontal ? "x" : "y")}: repeat(100%); ");

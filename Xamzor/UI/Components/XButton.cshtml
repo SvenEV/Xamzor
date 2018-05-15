@@ -3,7 +3,7 @@
 <!--
     TODO: We really want to use <button> here but "max-height" is zero inside buttons in Firefox
 -->
-<div id="@Id" class="@CssClass" style="@LayoutCss" role="button" tabindex="0"
+<div id="@Id" class="@CssClass" style="@LayoutCss" role="button" tabindex="0" ref="LayoutRoot"
      onclick="@((Action<UIMouseEventArgs>)OnClicked)">
     <!--
         'button' seems to somehow stretch its child content, even if child content wants to
@@ -34,5 +34,17 @@
     {
         base.ComputeOwnLayoutCss(sb);
         sb.Append("text-align: left; ");
+    }
+
+    protected override Point MeasureOverride(Point availableSize)
+    {
+        var border = new Point(4, 4);
+        return base.MeasureOverride(availableSize - border) + border;
+    }
+
+    protected override Point ArrangeOverride(Point finalSize)
+    {
+        var border = new Point(4, 4);
+        return base.ArrangeOverride(finalSize - border) + border;
     }
 }

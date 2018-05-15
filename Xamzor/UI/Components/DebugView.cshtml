@@ -1,0 +1,58 @@
+﻿@using Microsoft.AspNetCore.Blazor.RenderTree
+
+<div style="position: absolute; left: 0; width: 500px; height: 100%; 
+            background-color: black; display: flex; flex-flow: column; overflow-x: auto;
+            transform: translateX(-480px); transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);"
+     onmouseover="this.style.transform = ''; if (typeof xamzorDebugViewTimer !== 'undefined') { clearTimeout(xamzorDebugViewTimer); }"
+     onmouseout="xamzorDebugViewTimer = setTimeout(() => this.style.transform = 'translateX(-480px)', 2000);">
+
+    <div style="display: flex; min-height: 24px;">
+        <button onclick="@(e => { RefreshClicked?.Invoke(); UILog.Write("REFRESH", "StateHasChanged()"); })">Refresh</button>
+        <button onclick="@(e => Target().InvalidateMeasure())">InvalidateMeasure</button>
+        <button onclick="@(e => LayoutManager.Instance.RunQueuedLayoutPass())">Layout</button>
+    </div>
+
+    <ul style="color: white; font-family: 'Segoe UI'; list-style: none; margin: 0; padding-left: 20px;">
+        @RenderItem(Target())
+    </ul>
+
+</div>
+
+@functions{
+    [Parameter]
+    private Func<UIElement> Target { get; set; }
+
+    [Parameter]
+    private Action RefreshClicked { get; set; }
+
+    private RenderFragment RenderItem(UIElement element) => builder =>
+    {
+        builder.OpenElement(3, "li");
+
+        var children = element.Properties
+            .Get<ISet<XamzorComponent>>(XamzorComponent.ChildrenProperty)
+            .OfType<UIElement>()
+            .ToList();
+
+        builder.OpenElement(0, "strong");
+        builder.AddAttribute(1, "style", "cursor: pointer;");
+        builder.AddAttribute(2, "onclick", BindMethods.GetEventHandlerValue<UIMouseEventArgs>(_ =>
+        {
+            UILog.Write("REFRESH", "StateHasChanged() on " + element);
+            element.RaiseStateHasChanged();
+        }));
+        builder.AddContent(3, element.ToString());
+        builder.CloseElement();
+        //builder.AddContent(4, $" ({children.Count} children)");
+
+        builder.OpenElement(5, "ul");
+        builder.AddAttribute(6, "style", "list-style: none; margin: 0; padding-left: 20px;");
+        foreach (var child in children)
+        {
+            RenderItem(child)(builder);
+        }
+        builder.CloseElement();
+
+        builder.CloseElement();
+    };
+}

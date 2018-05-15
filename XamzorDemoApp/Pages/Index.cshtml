@@ -1,31 +1,37 @@
 ﻿@page "/"
 
 <div style="position: absolute; width: 100%; height: 100%; display: grid;">
+    <XamzorView ref="_xamzorView">
 
-    <Grid Parent="PARENT" RowDefinitions="@Rows("Auto", "*")"
-          Background="#eee">
+        <Grid Parent="PARENT" RowDefinitions="@Rows("Auto", "*")"
+              Background="#eee">
 
-        <Border Parent="PARENT" Background="@ThemeColor" Padding="T(24,12)" Row="0">
-            <TextBlock Parent="PARENT"
-                       Text="Xamzor Demo App"
-                       Foreground="white"
-                       FontSize="32.0" />
-        </Border>
+            <Border Parent="PARENT" Background="@ThemeColor" Padding="T(24,12)" Row="0">
+                <TextBlock Parent="PARENT"
+                           Text="Xamzor Demo App"
+                           Foreground="white"
+                           FontSize="32.0" />
+            </Border>
 
-        @*<TextBlock Parent="PARENT" Row="1"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="Demo content coming soon." />*@
+            @*<TextBlock Parent="PARENT" Row="1"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Text="Demo content coming soon." />*@
 
-        <FlipView Parent="PARENT" Items="@Demos" Row="1"
-                  ItemTemplate="typeof(DemoPresenter)"/>
+            <FlipView Parent="PARENT" Items="@Demos" Row="1"
+                      ItemTemplate="typeof(DemoPresenter)" />
 
-    </Grid>
+        </Grid>
 
+    </XamzorView>
+
+    <DebugView Target="() => _xamzorView" RefreshClicked="StateHasChanged" />
 </div>
 
 @functions {
     public const string ThemeColor = "#7014e8";
+
+    private XamzorView _xamzorView;
 
     private static ComponentGalleryItem[] Demos = new[]
     {
@@ -40,7 +46,7 @@
             View = typeof(MoreComingSoon)
         }
     };
-
+    
     public class ComponentGalleryItem
     {
         public string Title { get; set; }

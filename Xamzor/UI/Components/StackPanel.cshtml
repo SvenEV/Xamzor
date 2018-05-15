@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss background-color: @Background;">
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
     @ChildContent
 </div>
 
@@ -18,12 +18,91 @@
     {
         base.ComputeOwnLayoutCss(sb);
 
-        var isHorizontal = Orientation == Orientation.Horizontal;
-        sb.Append($"grid-auto-flow: {(isHorizontal ? "column" : "row")}; ");
-        sb.Append($"grid-auto-{(isHorizontal ? "columns" : "rows")}: max-content; ");
-        sb.Append($"grid-template-{(isHorizontal ? "columns" : "rows")}: none; ");
+        if (!string.IsNullOrEmpty(Background))
+            sb.Append($"background-color: {Background}; ");
+    }
 
-        if (Spacing != 0)
-            sb.Append($"grid-gap: {Spacing}px; ");
+    protected override Point MeasureOverride(Point availableSize)
+    {
+        return (Orientation == Orientation.Vertical)
+            ? MeasureVertically()
+            : MeasureHorizontally();
+
+        Point MeasureVertically()
+        {
+            var childAvailableSize = new Point(
+                Clamp(Width.OrIfNan(availableSize.X), MinWidth, MaxWidth),
+                double.PositiveInfinity);
+
+            var measuredSize = Point.Zero;
+
+            foreach (var child in Children.OfType<UIElement>())
+            {
+                child.Measure(childAvailableSize);
+                measuredSize = new Point(
+                    Max(measuredSize.X, child.DesiredSize.X),
+                    measuredSize.Y + child.DesiredSize.Y + Spacing);
+            }
+
+            return measuredSize - new Point(0, Spacing);
+        }
+
+        Point MeasureHorizontally()
+        {
+            var childAvailableSize = new Point(
+                double.PositiveInfinity,
+                Clamp(Height.OrIfNan(availableSize.Y), MinHeight, MaxHeight));
+
+            var measuredSize = Point.Zero;
+
+            foreach (var child in Children.OfType<UIElement>())
+            {
+                child.Measure(childAvailableSize);
+                measuredSize = new Point(
+                    measuredSize.X + child.DesiredSize.X + Spacing,
+                    Max(measuredSize.Y, child.DesiredSize.Y));
+            }
+
+            return measuredSize - new Point(Spacing, 0);
+        }
+    }
+
+    protected override Point ArrangeOverride(Point finalSize)
+    {
+        return (Orientation == Orientation.Vertical)
+            ? ArrangeVertically()
+            : ArrangeHorizontally();
+
+        Point ArrangeVertically()
+        {
+            var arrangedSize = new Point(finalSize.X, 0);
+
+            foreach (var child in Children.OfType<UIElement>())
+            {
+                var childSize = child.DesiredSize;
+                child.Arrange(new Rect(0, arrangedSize.Y, Max(childSize.X, arrangedSize.X), childSize.Y));
+                arrangedSize = new Point(
+                    Max(arrangedSize.X, childSize.X),
+                    arrangedSize.Y + childSize.Y + Spacing);
+            }
+
+            return new Point(arrangedSize.X, Max(arrangedSize.Y - Spacing, finalSize.Y));
+        }
+
+        Point ArrangeHorizontally()
+        {
+            var arrangedSize = new Point(0, finalSize.Y);
+
+            foreach (var child in Children.OfType<UIElement>())
+            {
+                var childSize = child.DesiredSize;
+                child.Arrange(new Rect(arrangedSize.X, 0, childSize.X, Max(childSize.Y, arrangedSize.Y)));
+                arrangedSize = new Point(
+                    arrangedSize.X + childSize.X + Spacing,
+                    Max(arrangedSize.Y, childSize.Y));
+            }
+
+            return new Point(Max(arrangedSize.X - Spacing, finalSize.X), arrangedSize.Y);
+        }
     }
 }

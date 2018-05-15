@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss"
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot"
      xamzor-zoommode="@ZoomMode"
      xamzor-scrollbarvisibility="@ScrollBarVisibility">
     <!--
@@ -36,7 +36,7 @@
 
         // Compute CSS for inner div
         var innerCss = new System.Text.StringBuilder("display: grid; border-style: solid; border-color: transparent; ");
-        innerCss.Append($"border-width: {ThicknessToCss(Padding)}; ");
+        innerCss.Append($"border-width: {Css.FromThickness(Padding)}; ");
 
         // If scrolling is disabled, set minimum size to 0 (default is auto) to allow
         // the inner div to become smaller than its content, forcing the content to get
@@ -65,5 +65,35 @@
 
         if (VerticalScrollMode != ScrollMode.Disabled)
             sb.Append($"max-height: none; ");
+    }
+
+    protected override Point MeasureOverride(Point availableSize)
+    {
+        // Space in each direction is unlimited if scrolling is allowed
+        var childAvailableSize = new Point(
+            (HorizontalScrollMode == ScrollMode.Disabled) ? availableSize.X : double.PositiveInfinity,
+            (VerticalScrollMode == ScrollMode.Disabled) ? availableSize.Y : double.PositiveInfinity);
+
+        var childSize = Children.OfType<UIElement>().FirstOrDefault()?
+            .Measure(childAvailableSize) ?? Point.Zero;
+
+        return childSize;
+    }
+
+    protected override Point ArrangeOverride(Point finalSize)
+    {
+        if (Children.FirstOrDefault() is UIElement child)
+        {
+            // To prevent the child from applying clipping, we provide it the size it desires even
+            // if that exceeds the given finalSize. (With clipping, we wouldn't see any content when 
+            // scrolling beyond the initial scroll position.)
+            var arrangeSize = new Point(
+                (HorizontalScrollMode == ScrollMode.Disabled) ? finalSize.X : Math.Max(finalSize.X, child.DesiredSize.X),
+                (VerticalScrollMode == ScrollMode.Disabled) ? finalSize.Y : Math.Max(finalSize.Y, child.DesiredSize.Y));
+
+            child.Arrange(new Rect(Point.Zero, arrangeSize));
+        }
+
+        return finalSize;
     }
 }

@@ -13,13 +13,16 @@ namespace Xamzor.UI.Components
 
         public static readonly PropertyKey TagProperty = PropertyKey.Create<string, XamzorComponent>(nameof(Tag));
         public static readonly PropertyKey ParentProperty = PropertyKey.Create<XamzorComponent, XamzorComponent>(nameof(Parent));
+        public static readonly PropertyKey ChildrenProperty = PropertyKey.Create<ISet<XamzorComponent>, XamzorComponent>(nameof(Children));
         public static readonly PropertyKey ChildContentProperty = PropertyKey.Create<RenderFragment, XamzorComponent>(nameof(ChildContent));
 
         public readonly PropertyContainer Properties = new PropertyContainer();
+        public bool IsRealized { get; private set; }
+
         private readonly string _cssClasses;
         private bool _debugRenderCount = false;
 
-        protected string CssClass => Application.IsDebugOutlineEnabled
+        protected virtual string CssClass => Application.IsDebugOutlineEnabled
             ? _cssClasses + (_debugRenderCount ? " debug1" : " debug2")
             : _cssClasses;
 
@@ -46,6 +49,9 @@ namespace Xamzor.UI.Components
             get => Properties.Get<XamzorComponent>(ParentProperty);
             set => Properties.Set(ParentProperty, value);
         }
+
+        protected ISet<XamzorComponent> Children =>
+            Properties.Get<ISet<XamzorComponent>>(ChildrenProperty);
         
         public XamzorComponent()
         {
@@ -64,13 +70,29 @@ namespace Xamzor.UI.Components
 
         protected override void OnInit()
         {
+            base.OnInit();
             UILog.Write("LIFECYCLE", $"Initialize '{this}'");
         }
 
-        public override void SetParameters(ParameterCollection parameters)
+        protected override void OnAfterRender()
         {
-            // Assign to properties
-            base.SetParameters(parameters);
+            base.OnAfterRender();
+            IsRealized = true;
+        }
+
+        protected override void BuildRenderTree(RenderTreeBuilder builder)
+        {
+            base.BuildRenderTree(builder);
+            UILog.Write("LIFECYCLE", $"BuildRenderTree '{this}'");
+            _debugRenderCount = !_debugRenderCount;
+        }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            // Clear list of children
+            Properties.Set(ChildrenProperty, new HashSet<XamzorComponent>());
 
             // Inject helper code into ChildContent
             if (ChildContent is RenderFragment originalChildContent)
@@ -84,24 +106,28 @@ namespace Xamzor.UI.Components
                 };
             }
 
-            if (!parameters.TryGetValue(nameof(Parent), out object _))
-                UILog.Write("WARNING", $"No parent assigned to '{this}'");
+            Parent?.Properties.Get<ISet<XamzorComponent>>(ChildrenProperty)?.Add(this);
 
-            UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{Parent}')");
+            UILog.Write("LIFECYCLE", $"OnParametersSet '{this}' (parent is '{Parent}')");
         }
 
-        public override string ToString() => Id + (Tag == null ? "" : "-" + Tag);
+        //public override void SetParameters(ParameterCollection parameters)
+        //{
+        //    UILog.Write("LIFECYCLE", $"SetParameters '{this}' (parent is '{Parent}', props are {string.Join(", ", parameters.ToDictionary().Select(o => $"{o.Key} = {o.Value}"))})");
+        //    if (!parameters.TryGetValue(nameof(Parent), out object _) && !(this is XamzorView))
+        //        UILog.Write("WARNING", $"No parent assigned to '{this}'");
+        //
+        //    // Assign to properties
+        //    base.SetParameters(parameters);
+        //}
 
         public virtual void Dispose()
         {
             UILog.Write("LIFECYCLE", $"Dispose '{this}'");
         }
 
-        protected override void BuildRenderTree(RenderTreeBuilder builder)
-        {
-            base.BuildRenderTree(builder);
-            UILog.Write("LIFECYCLE", $"BuildRenderTree '{this}'");
-            _debugRenderCount = !_debugRenderCount;
-        }
+        public override string ToString() => Id + (Tag == null ? "" : "-" + Tag);
+
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }

@@ -1,5 +1,9 @@
 ﻿@inherits DataTemplate
 
-<TextBlock>
-    Watch <a href="https://github.com/SvenEV/Xamzor">Xamzor on GitHub</a> for updates.
-</TextBlock>
+<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
+
+    <TextBlock Parent="this">
+        Watch <a href="https://github.com/SvenEV/Xamzor">Xamzor on GitHub</a> for updates.
+    </TextBlock>
+
+</div>

@@ -14,7 +14,8 @@ namespace Xamzor.UI
 
         public static HashSet<string> ExcludedCategories { get; set; } = new HashSet<string>
         {
-            "LIFECYCLE", "PARENT"
+            //"LIFECYCLE", "PARENT"
+            //"LAYOUT", "TEXT"
         };
 
         public static IDisposable BeginScope(string category, string enterText, Func<string> exitText = null, bool writeBraces = false)
