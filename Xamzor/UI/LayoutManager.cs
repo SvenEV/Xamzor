@@ -1,4 +1,5 @@
 ﻿using Layman;
+using Layman.Diagnostics;
 using System.Collections.Generic;
 using Xamzor.UI.Components;
 
@@ -6,22 +7,19 @@ namespace Xamzor.UI
 {
     public class LayoutManager
     {
-        private readonly ConsoleTraceWriter _traceWriter = new ConsoleTraceWriter();
-        private readonly Queue<UIElement> _toMeasure = new Queue<UIElement>();
+        private readonly ILayoutTraceWriter _traceWriter = new BenchmarkTraceWriter();
+        //private readonly ILayoutTraceWriter _traceWriter = new ConsoleTraceWriter
+        //{
+        //    IgnoreNonSpecial = true,
+        //    //IgnoredPrefixes = { "Align", "Fixed", "Clamp", "Inset", "Cache" }
+        //};
+
         private readonly Queue<UIElement> _toArrange = new Queue<UIElement>();
         private bool _queued;
         private bool _running;
 
         public static LayoutManager Instance { get; } = new LayoutManager();
-
-        public void InvalidateMeasure(UIElement control)
-        {
-            _toMeasure.Enqueue(control);
-            _toArrange.Enqueue(control);
-            QueueLayoutPass();
-            UILog.Write("LAYOUT", $"InvalidateMeasure on '{control}' - now {_toMeasure.Count} in queue");
-        }
-
+        
         public void InvalidateArrange(UIElement control)
         {
             _toArrange.Enqueue(control);
@@ -37,17 +35,16 @@ namespace Xamzor.UI
                 _running = true;
 
                 using (UILog.BeginScope("LAYMAN",
-                    $"Started layout pass. To measure: {_toMeasure.Count} To arrange: {_toArrange.Count}",
+                    $"Started layout pass. To arrange: {_toArrange.Count}",
                     () => $"Layout done"))
                 {
                     try
                     {
                         for (var pass = 0; pass < MaxPasses; ++pass)
                         {
-                            ExecuteMeasurePass();
                             ExecuteArrangePass();
 
-                            if (_toMeasure.Count == 0)
+                            if (_toArrange.Count == 0)
                                 break;
                         }
                     }
@@ -63,7 +60,6 @@ namespace Xamzor.UI
 
         public void ExecuteInitialLayoutPass(XamzorView root)
         {
-            Measure(root);
             Arrange(root);
 
             // Running the initial layout pass may have caused some control to be invalidated
@@ -73,71 +69,34 @@ namespace Xamzor.UI
             ExecuteLayoutPass();
         }
 
-        private void ExecuteMeasurePass()
-        {
-            while (_toMeasure.Count > 0)
-            {
-                var control = _toMeasure.Dequeue();
-
-                if (!control.LayoutCache.IsMeasureValid)
-                    Measure(control);
-            }
-        }
-
         private void ExecuteArrangePass()
         {
-            while (_toArrange.Count > 0 && _toMeasure.Count == 0)
+            System.Console.WriteLine("ExecuteArrangePass");
+
+            while (_toArrange.Count > 0)
             {
                 var control = _toArrange.Dequeue();
+                System.Console.WriteLine("About to arrange " + control + ": " + control.LayoutCache.IsArrangeValid);
 
                 if (!control.LayoutCache.IsArrangeValid)
                     Arrange(control);
             }
         }
 
-        private void Measure(UIElement control)
-        {
-            // Controls closest to the visual root need to be arranged first. We don't try to store
-            // ordered invalidation lists, instead we traverse the tree upwards, measuring the
-            // controls closest to the root first. This has been shown by benchmarks to be the
-            // fastest and most memory-efficent algorithm.
-            if (control.Properties.Get<XamzorComponent>(XamzorComponent.ParentProperty) is UIElement parent)
-            {
-                Measure(parent);
-            }
-
-            // If the control being measured has IsMeasureValid == true here then its measure was
-            // handed by an ancestor and can be ignored. The measure may have also caused the
-            // control to be removed.
-            if (!control.LayoutCache.IsMeasureValid)
-            {
-                UILog.Write("LAYMAN", $"Measuring '{control}'");
-
-                var space = (control is XamzorView root)
-                    ? root.MeasureRoot()
-                    : control.LayoutCache.PreviousMeasureInput.Value;
-
-                var context = LayoutContext.CreateForMeasure(space, _traceWriter);
-                control.Layout(context);
-            }
-        }
-
         private void Arrange(UIElement control)
         {
-            var props = new LayoutProperties(control.Properties);
-
-            if (props.Parent is UIElement parent)
+            if (control.Properties.Get<XamzorComponent>(XamzorComponent.ParentProperty) is UIElement parent)
             {
                 Arrange(parent);
             }
 
             if (!control.LayoutCache.IsArrangeValid)
             {
-                UILog.Write("LAYMAN", $"Arranging '{control}'");
-
                 var rect = (control is XamzorView root)
-                    ? new Rect(Vector2.Zero, root.LayoutCache.DesiredSize)
+                    ? new Rect(Vector2.Zero, root.DetermineRootSize())
                     : control.LayoutCache.PreviousArrangeInput.Value;
+
+                UILog.Write("LAYMAN", $"Arranging '{control}' with {rect}");
 
                 var context = LayoutContext.CreateForArrange(rect, _traceWriter);
                 control.Layout(context);
@@ -147,9 +106,7 @@ namespace Xamzor.UI
         private void QueueLayoutPass()
         {
             if (!_queued && !_running)
-            {
                 _queued = true;
-            }
         }
 
         public void RunQueuedLayoutPass()
@@ -157,26 +114,5 @@ namespace Xamzor.UI
             if (_queued)
                 ExecuteLayoutPass();
         }
-    }
-
-    public struct LayoutProperties
-    {
-        private readonly PropertyContainer Properties;
-
-        public LayoutProperties(PropertyContainer props) => Properties = props;
-
-        public XamzorComponent Parent => Properties.Get<XamzorComponent>(XamzorComponent.ParentProperty);
-        public ISet<XamzorComponent> Children => Properties.Get<ISet<XamzorComponent>>(XamzorComponent.ChildrenProperty);
-        public double Width => Properties.Get<double>(UIElement.WidthProperty);
-        public double Height => Properties.Get<double>(UIElement.HeightProperty);
-        public double MinWidth => Properties.Get<double>(UIElement.MinWidthProperty);
-        public double MinHeight => Properties.Get<double>(UIElement.MinHeightProperty);
-        public double MaxWidth => Properties.Get<double>(UIElement.MaxWidthProperty);
-        public double MaxHeight => Properties.Get<double>(UIElement.MaxHeightProperty);
-        public Thickness Margin => Properties.Get<Thickness>(UIElement.MarginProperty);
-        public Thickness Padding => Properties.Get<Thickness>(UIElement.PaddingProperty);
-        public Alignment HorizontalAlignment => Properties.Get<Alignment>(UIElement.HorizontalAlignmentProperty);
-        public Alignment VerticalAlignment => Properties.Get<Alignment>(UIElement.VerticalAlignmentProperty);
-        public double Opacity => Properties.Get<double>(UIElement.OpacityProperty);
     }
 }

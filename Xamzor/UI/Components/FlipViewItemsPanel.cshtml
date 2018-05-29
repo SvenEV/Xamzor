@@ -1,7 +1,7 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
-    @ChildContent
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
+    @ChildContent.SurroundWithParent(this)
 </div>
 
 @functions {
@@ -11,9 +11,9 @@
     [Parameter]
     protected Orientation Orientation { get => Properties.Get<Orientation>(OrientationProperty); set => Properties.Set(OrientationProperty, value); }
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
 
         var isHorizontal = Orientation == Orientation.Horizontal;
         sb.Append($"overflow-{(isHorizontal ? "x" : "y")}: scroll; ");
@@ -22,5 +22,36 @@
         sb.Append($"-ms-scroll-snap-points-{(isHorizontal ? "x" : "y")}: snapInterval(0, 100%); ");
     }
 
-    protected override LayoutFunc ChildLayout => Layouts.Stack(Orientation, 0, Children.OfType<UIElement>().Select(child => child.Layout));
+    // TODO: This needs to be customized so each child consumes all the space
+    protected override LayoutFunc ChildLayout => Layouts.TraceSpecial(context =>
+    {
+        var children = Children.OfType<UIElement>().Select(c => c.Layout).ToList();
+
+        switch (context.Phase)
+        {
+            case LayoutPhase.Measure:
+                foreach (var child in children)
+                    child(context);
+
+                return new Vector2(children.Count * context.Space.X, context.Space.Y);
+
+            case LayoutPhase.Arrange:
+                if (!children.Any())
+                    return context.Rect;
+
+                for (var i = 0; i < children.Count; i++)
+                {
+                    var childArrangeInput = context.ForArrange(
+                        context.Offset + i * new Vector2(context.Space.X, 0),
+                        context.Space);
+
+                    children[i](childArrangeInput);
+                }
+
+                return new Rect(context.Offset, new Vector2(children.Count * context.Space.X, context.Space.Y));
+
+            default:
+                throw new NotImplementedException();
+        }
+    });
 }

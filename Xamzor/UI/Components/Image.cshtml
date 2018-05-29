@@ -1,166 +1,42 @@
-﻿@inherits UIElement
+﻿@using static Layman.Layouts
+@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
-    <img style="@InnerCss" src="@Source" onerror="this.style.display = 'none'" />
-</div>
+<img id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot"
+     src="@Source" onerror="this.style.display = 'none'" />
 
 @functions{
 
-    // TODO: StretchDirection is not yet supported
-
     public static readonly PropertyKey SourceProperty = PropertyKey.Create<string, Image>(nameof(Source));
-    public static readonly PropertyKey StretchProperty = PropertyKey.Create<ImageStretch, Image>(nameof(Stretch), ImageStretch.Uniform);
+    public static readonly PropertyKey StretchProperty = PropertyKey.Create<StretchMode, Image>(nameof(Stretch), StretchMode.Uniform);
     public static readonly PropertyKey StretchDirectionProperty = PropertyKey.Create<StretchDirection, Image>(nameof(StretchDirection), StretchDirection.Both);
 
     [Parameter] protected string Source { get => Properties.Get<string>(SourceProperty); set => Properties.Set(SourceProperty, value); }
-    [Parameter] protected ImageStretch Stretch { get => Properties.Get<ImageStretch>(StretchProperty); set => Properties.Set(StretchProperty, value); }
+    [Parameter] protected StretchMode Stretch { get => Properties.Get<StretchMode>(StretchProperty); set => Properties.Set(StretchProperty, value); }
     [Parameter] protected StretchDirection StretchDirection { get => Properties.Get<StretchDirection>(StretchDirectionProperty); set => Properties.Set(StretchDirectionProperty, value); }
 
     private Vector2 _imageSize;
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
-    {
-        base.ComputeOwnLayoutCss(sb);
-
-        var size =
-            Stretch == ImageStretch.Fill ? "100% 100%" :
-            Stretch == ImageStretch.Uniform ? "contain" :
-            Stretch == ImageStretch.UniformToFill ? "cover" :
-            Stretch == ImageStretch.None ? "none" :
-            throw new NotImplementedException();
-
-        sb.Append($"background-image: url({Source}); ");
-        sb.Append($"background-size: {size}; ");
-        sb.Append($"background-position: {AlignmentToPosition(HorizontalAlignment)} {AlignmentToPosition(VerticalAlignment)}; ");
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        await base.OnParametersSetAsync();
+        await (base.OnParametersSetAsync() ?? Task.CompletedTask);
 
         if (_imageSize != Vector2.Zero || string.IsNullOrWhiteSpace(Source))
             return;
 
         _imageSize = await ImageMeasureInterop.MeasureImageAsync(Source);
-        InvalidateMeasure();
+        LayoutCache?.InvalidateMeasure();
     }
 
-    private string InnerCss
-    {
-        get
-        {
-            var sb = new System.Text.StringBuilder();
-
-            if (!double.IsNaN(Width))
-                sb.Append($"width: {Width}px; ");
-
-            if (!double.IsNaN(Height))
-                sb.Append($"height: {Height}px; ");
-
-            if (MinWidth > 0)
-                sb.Append($"min-width: {MinWidth}px; ");
-
-            if (MinHeight > 0)
-                sb.Append($"min-height: {MinHeight}px; ");
-
-            if (MaxWidth != double.PositiveInfinity)
-                sb.Append($"max-width: {MaxWidth}px; ");
-
-            if (MaxHeight != double.PositiveInfinity)
-                sb.Append($"max-height: {MaxHeight}px; ");
-
-            switch (Stretch)
-            {
-                case ImageStretch.Fill:
-                    break;
-
-                case ImageStretch.Uniform:
-                    sb.Append($"object-fit: contain; ");
-                    break;
-
-                case ImageStretch.UniformToFill:
-                    sb.Append($"object-fit: cover; ");
-                    break;
-
-                case ImageStretch.None:
-                    sb.Append($"object-fit: none; ");
-                    break;
-            }
-
-            sb.Append($"object-position: {AlignmentToPosition(HorizontalAlignment)} {AlignmentToPosition(VerticalAlignment)}; ");
-
-
-            return sb.ToString();
-        }
-    }
-
-    private static string AlignmentToPosition(Alignment a) =>
-        a == Alignment.Start ? "0%" :
-        a == Alignment.End ? "100%" :
-        a == Alignment.Center ? "50%" :
-        a == Alignment.Stretch ? "50%" :
-        throw new NotImplementedException();
-
-    // TODO: 'Stretch' behavior does not match XAML 100%. If image fits into space, centering (50%) is correct.
-    // If image exceeds available space, XAML aligns at start instead of center.
-
-
-
-
-    /*
-    protected override Point MeasureOverride(Point availableSize) =>
-        MeasureArrange(availableSize);
-
-    protected override Point ArrangeOverride(Point finalSize) =>
-        MeasureArrange(finalSize);
-
-    private Point MeasureArrange(Point availableSize)
-    {
-        var scaleFactor = ComputeScaleFactor(availableSize, _imageSize, Stretch, StretchDirection);
-        return _imageSize * scaleFactor;
-    }
-
-    private static Point ComputeScaleFactor(Point availableSize, Point contentSize, ImageStretch stretch, StretchDirection stretchDirection)
-    {
-        var scale = Point.One;
-        var isWidthConstrained = !double.IsPositiveInfinity(availableSize.X);
-        var isHeightConstrained = !double.IsPositiveInfinity(availableSize.Y);
-
-        if (stretch != ImageStretch.None && (isWidthConstrained || isHeightConstrained))
-        {
-            scale = new Point(
-                Helpers.EqualsApprox(0, contentSize.X) ? 0 : availableSize.X / contentSize.X,
-                Helpers.EqualsApprox(0, contentSize.Y) ? 0 : availableSize.Y / contentSize.Y);
-
-            if (!isWidthConstrained)
-            {
-                scale = scale.WithX(scale.Y);
-            }
-            else if (!isHeightConstrained)
-            {
-                scale = scale.WithY(scale.X);
-            }
-            else
-            {
-                switch (stretch)
-                {
-                    case ImageStretch.Uniform:
-                        scale = Math.Min(scale.X, scale.Y) * Point.One;
-                        break;
-
-                    case ImageStretch.UniformToFill:
-                        scale = Math.Max(scale.X, scale.Y) * Point.One;
-                        break;
-                }
-            }
-
-            // Account for stretch direction
-            var minScale = (stretchDirection == StretchDirection.UpOnly) ? Point.One : Point.Zero;
-            var maxScale = (stretchDirection == StretchDirection.DownOnly) ? Point.One : Point.PositiveInfinity;
-            scale = Point.Clamp(scale, minScale, maxScale);
-        }
-
-        return scale;
-    }
-    */
+    // TODO: Incorporate scaling into StandardLayout because why not?
+    // ====> Maybe the FillSpace() call speaks against this...?
+    public override LayoutFunc Layout =>
+        TraceSpecial(ToString(),
+            Callback(onArrangeOut: (_, __) => ApplyBounds(), child:
+                Inset(Margin,
+                    Cache(LayoutCache,
+                        Align(HorizontalAlignment, VerticalAlignment,
+                            FixedSize(new Vector2(Width, Height),
+                                ClampSize(new Vector2(MinWidth, MinHeight), new Vector2(MaxWidth, MaxHeight),
+                                    Scale(Stretch, StretchDirection,
+                                        FixedSize(_imageSize)))))))));
 }

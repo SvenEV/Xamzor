@@ -10,30 +10,6 @@
     box-sizing: border-box;
 }
 
-.UIElement.TextBlock {
-    display: initial;
-}
-
-.UIElement.Image {
-    justify-self: stretch !important;
-    align-self: stretch !important;
-    width: initial !important;
-    height: initial !important;
-    min-width: initial !important;
-    min-height: initial !important;
-    max-width: initial !important;
-    max-height: initial !important;
-    background-repeat: no-repeat;
-}
-
-.UIElement.Image > img {
-    min-width: 0;
-    min-height: 0;
-    max-width: 100%; /* fixes some cases */
-    /* adding "max-height: 100%" fixes all known cases in Edge/Firefox but breaks things in Webkit */
-    visibility: hidden;
-}
-
 .UIElement.ScrollViewer[xamzor-zoommode="Enabled"] {
     -ms-content-zooming: zoom;
 }
@@ -54,16 +30,21 @@
 }
 
 .XButton {
-    background-color: #CCCCCC;
-    border: 2px solid #CCCCCC;
+    background: none;
+    border: none;
     transition: transform .3s;
 }
 
-.XButton:hover {
+.XButton > .Border {
+    background-color: #CCCCCC;
+    border: 2px solid #CCCCCC;
+}
+
+.XButton:hover > .Border {
     border: 2px solid #7A7A7A;
 }
 
-.XButton:active {
+.XButton:active > .Border {
     background-color: #999999;
     border: 2px solid #999999;
     transform: scale(.98);
@@ -71,8 +52,11 @@
 }
 
 .XButton:focus {
-    border: 2px solid #7A7A7A;
     outline: none;
+}
+
+.XButton:focus > .Border {
+    border: 2px solid #7A7A7A;
 }
 
 .debug1 {

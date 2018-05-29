@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Blazor
+@using Microsoft.AspNetCore.Blazor.Components
+@using System
+
+@inherits ContentControl
+
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot"
+     onclick="@OnClicked">
+    @*<XButton Parent="this" Clicked="Clicked">*@
+        @ActualContent.SurroundWithParent(this)
+    @*</XButton>*@
+</div>
+
+@functions {
+    public static readonly PropertyKey ClickedProperty = PropertyKey.Create<EventHandler<UIMouseEventArgs>, ListViewItem>(nameof(Clicked));
+
+    protected override bool OverridesContainer => true;
+
+    [Parameter]
+    protected EventHandler<UIMouseEventArgs> Clicked
+    {
+        get => Properties.Get<EventHandler<UIMouseEventArgs>>(ClickedProperty);
+        set => Properties.Set(ClickedProperty, value);
+    }
+
+    private void OnClicked(UIMouseEventArgs e) => Clicked?.Invoke(this, e);
+}

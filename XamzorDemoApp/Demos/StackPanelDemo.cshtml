@@ -1,26 +1,29 @@
 ﻿@inherits DataTemplate
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
     
-    <Grid Parent="this" ColumnDefinitions="@Columns("*", "*")">
+    <Grid Parent="this" ColumnDefinitions="@Columns("Auto", "*")">
 
-        <StackPanel Parent="PARENT">
+        <StackPanel Parent="PARENT" Tag="LayoutControllerStack">
             <LayoutController Parent="PARENT" Update="StateHasChanged" Title="StackPanel" Ref="_stack"
-                              ShowOrientation="true" />
+                              ShowOrientation="true"
+                              Tag="LayoutController1"/>
 
-            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Red Box" Ref="_box1" />
-            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Yellow Box" Ref="_box2" />
-            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Green Box" Ref="_box3" />
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Red Box" Ref="_box1" Tag="LayoutController2" />
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Yellow Box" Ref="_box2" Tag="LayoutController3" />
+            <LayoutController Parent="PARENT" Update="StateHasChanged" Title="Green Box" Ref="_box3" Tag="LayoutController4" />
         </StackPanel>
 
         <Border Parent="PARENT"
                 Column="1"
                 BorderBrush="black"
-                BorderThickness="T(2)">
+                BorderThickness="T(2)"
+                Tag="StackPanelContainer">
 
             <StackPanel Parent="PARENT" Orientation="_stack.TheOrientation"
                         HorizontalAlignment="_stack.TheHorizontalAlignment"
-                        VerticalAlignment="_stack.TheVerticalAlignment">
+                        VerticalAlignment="_stack.TheVerticalAlignment"
+                        Tag="TheStackPanel">
 
                 <Border Parent="PARENT"
                         Background="red"

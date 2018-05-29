@@ -1,14 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Blazor.RenderTree
 
-<div style="position: absolute; left: 0; width: 500px; height: 100%; 
+<div style="position: absolute; left: 0; width: 500px; height: 100%; z-index: 1000;
             background-color: black; display: flex; flex-flow: column; overflow-x: auto;
-            transform: translateX(-480px); transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);"
-     onmouseover="this.style.transform = ''; if (typeof xamzorDebugViewTimer !== 'undefined') { clearTimeout(xamzorDebugViewTimer); }"
-     onmouseout="xamzorDebugViewTimer = setTimeout(() => this.style.transform = 'translateX(-480px)', 2000);">
+            transform: translateX(-480px); opacity: 0.01;
+            transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);"
+     onmouseover="this.style.transform = ''; this.style.opacity = '0.8'; if (typeof xamzorDebugViewTimer !== 'undefined') { clearTimeout(xamzorDebugViewTimer); }"
+     onmouseout="xamzorDebugViewTimer = setTimeout(() => { this.style.transform = 'translateX(-480px)'; this.style.opacity = '0.01' }, 2000);">
 
     <div style="display: flex; min-height: 24px;">
         <button onclick="@(e => { RefreshClicked?.Invoke(); UILog.Write("REFRESH", "StateHasChanged()"); })">Refresh</button>
-        <button onclick="@(e => Target().InvalidateMeasure())">InvalidateMeasure</button>
+        <button onclick="@(e => Target().LayoutCache.InvalidateMeasure())">InvalidateMeasure</button>
         <button onclick="@(e => LayoutManager.Instance.RunQueuedLayoutPass())">Layout</button>
     </div>
 

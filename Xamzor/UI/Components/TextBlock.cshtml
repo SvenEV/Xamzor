@@ -1,12 +1,12 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">@if (Text != null)
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">@if (Text != null)
     {
         @Text
     }
     else
     {
-        @ChildContent
+        @ChildContent.SurroundWithParent(this)
     }
 </div>
 
@@ -32,7 +32,7 @@
     [Parameter] protected bool IsTextSelectionEnabled { get => Properties.Get<bool>(IsTextSelectionEnabledProperty); set => Properties.Set(IsTextSelectionEnabledProperty, value); }
     [Parameter] protected string Text { get => Properties.Get<string>(TextProperty); set => Properties.Set(TextProperty, value); }
 
-    protected override LayoutFunc ChildLayout => context =>
+    protected override LayoutFunc ChildLayout => Layouts.Trace(context =>
     {
         switch (context.Phase)
         {
@@ -45,11 +45,11 @@
             default:
                 throw new NotImplementedException();
         }
-    };
+    }, "HtmlTextLayout");
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
 
         if (FontFamily != null)
             sb.Append($"font-family: {FontFamily}; ");
@@ -77,15 +77,15 @@
             sb.Append("user-select: none; -ms-user-select: none; cursor: default; ");
     }
 
+    // TODO: Measure self (own HTML element if realized already)
     private Vector2 MeasureOverride(Vector2 availableSize)
     {
         if (Text == null && ChildContent == null)
             return Vector2.Zero;
 
-        // TODO: How to measure ChildContent?
-
-        var sizeString = RegisteredFunction.Invoke<string>("Xamzor.measureHtml",
-            $"<div style=\"{StyleCss} max-width: {availableSize.X}px; max-height: {availableSize.Y}px;\">{Text}</div>");
+        var widthConstraint = double.IsPositiveInfinity(availableSize.X) ? default(double?) : availableSize.X;
+        var heightConstraint = double.IsPositiveInfinity(availableSize.Y) ? default(double?) : availableSize.Y;
+        var sizeString = RegisteredFunction.Invoke<string>("Xamzor.measureHtml", LayoutRoot, widthConstraint, heightConstraint);
 
         var sizeParts = sizeString.Split(',');
 

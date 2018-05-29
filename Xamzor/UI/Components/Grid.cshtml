@@ -1,7 +1,7 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
-    @ChildContent
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
+    @ChildContent.SurroundWithParent(this)
 </div>
 
 @functions{
@@ -17,9 +17,9 @@
     [Parameter] protected double ColumnSpacing { get; set; } = 0;
     [Parameter] protected string Background { get; set; } = "transparent";
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
 
         if (!string.IsNullOrEmpty(Background))
             sb.Append($"background-color: {Background}; ");

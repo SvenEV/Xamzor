@@ -1,4 +1,5 @@
 ﻿using Layman;
+using Microsoft.AspNetCore.Blazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +20,21 @@ namespace Xamzor.UI
         public const Alignment Bottom = Alignment.End;
         public const Alignment Center = Alignment.Center;
         public const Alignment Stretch = Alignment.Stretch;
-        public const ImageStretch None = UI.ImageStretch.None;
-        public const ImageStretch Fill = UI.ImageStretch.Fill;
-        public const ImageStretch Uniform = UI.ImageStretch.Uniform;
-        public const ImageStretch UniformToFill = UI.ImageStretch.UniformToFill;
+        public const StretchMode None = StretchMode.None;
+        public const StretchMode Fill = StretchMode.Fill;
+        public const StretchMode Uniform = StretchMode.Uniform;
+        public const StretchMode UniformToFill = StretchMode.UniformToFill;
 
         // HACK
         public static XamzorComponent PARENT { get; set; }
+
+        public static RenderFragment SurroundWithParent(this RenderFragment fragment, XamzorComponent parent) => builder =>
+        {
+            var temp = PARENT;
+            PARENT = parent;
+            fragment?.Invoke(builder);
+            PARENT = temp;
+        };
 
         public static IReadOnlyList<GridTrackDefinition> Rows(params string[] sizeStrings) =>
             sizeStrings.Select(s => new GridTrackDefinition(GridLength.Parse(s))).ToList();

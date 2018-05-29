@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">@ChildContent</div>
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">@ChildContent.SurroundWithParent(this)</div>
 
 @functions{
 
@@ -14,9 +14,9 @@
     [Parameter] protected string Background { get => Properties.Get<string>(BackgroundProperty); set => Properties.Set(BackgroundProperty, value); }
     [Parameter] protected string BorderBrush { get => Properties.Get<string>(BorderBrushProperty); set => Properties.Set(BorderBrushProperty, value); }
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
 
         if (Background != null)
             sb.Append($"background-color: {Background}; ");
@@ -31,8 +31,6 @@
             sb.Append($"border-radius: {Css.FromThickness(CornerRadius)}; ");
     }
 
-    // TODO: Offset should NOT include BorderThickness.TopLeft as that is already
-    // accounted for by the HTML layout. We might need a custom Inset()-function here.
     protected override LayoutFunc ChildLayout =>
-        Layouts.Inset(BorderThickness, base.ChildLayout);
+        SpecialLayouts.InsetWithoutOffset(BorderThickness, base.ChildLayout);
 }

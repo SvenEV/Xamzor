@@ -13,7 +13,7 @@ namespace Xamzor.UI.Components
         protected EventHandler<object> ItemClicked
         {
             get => Properties.Get<EventHandler<object>>(ItemClickedProperty);
-            set => Properties.Set(ItemsProperty, value);
+            set => Properties.Set(ItemClickedProperty, value);
         }
 
         protected override void BuildItemsPanelRenderTree(RenderTreeBuilder builder, RenderFragment renderItems)

@@ -43,7 +43,7 @@ namespace Xamzor.UI.Components
         protected Type ItemsPanelTemplate
         {
             get => Properties.Get<Type>(ItemsPanelTemplateProperty);
-            set => Properties.Set(ItemTemplateProperty, value);
+            set => Properties.Set(ItemsPanelTemplateProperty, value);
         }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
@@ -53,7 +53,7 @@ namespace Xamzor.UI.Components
             builder.OpenElement(0, "div");
             builder.AddAttribute(1, "id", Id);
             builder.AddAttribute(2, "class", CssClass);
-            builder.AddAttribute(3, "style", LayoutCss);
+            builder.AddAttribute(3, "style", CssStyle);
             builder.AddElementReferenceCapture(4, r => LayoutRoot = r);
 
             BuildItemsPanelRenderTree(builder, innerBuilder =>

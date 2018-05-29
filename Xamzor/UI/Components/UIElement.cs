@@ -23,12 +23,7 @@ namespace Xamzor.UI.Components
 
         protected ElementRef LayoutRoot { get; set; }
 
-        protected string LayoutCss =>
-            //$"left: {Bounds.X}px; top: {Bounds.Y}px; width: {Bounds.Width}px; height: {Bounds.Height}px; " +
-            //$"clip: rect({ClippedBounds.Y - Bounds.Y}px, {ClippedBounds.X - Bounds.X + ClippedBounds.Width}px, {ClippedBounds.Y - Bounds.Y + ClippedBounds.Height}px, {ClippedBounds.X - Bounds.X}px); " + 
-            StyleCss;
-
-        protected string StyleCss { get; private set; }
+        protected string CssStyle { get; private set; }
 
         [Parameter] protected double Width { get => Properties.Get<double>(WidthProperty); set => Properties.Set(WidthProperty, value); }
         [Parameter] protected double Height { get => Properties.Get<double>(HeightProperty); set => Properties.Set(HeightProperty, value); }
@@ -48,63 +43,48 @@ namespace Xamzor.UI.Components
         [Parameter] protected int RowSpan { get => Properties.Get<int>(Grid.RowSpanProperty); set => Properties.Set(Grid.RowSpanProperty, value); }
         [Parameter] protected int ColumnSpan { get => Properties.Get<int>(Grid.ColumnSpanProperty); set => Properties.Set(Grid.ColumnSpanProperty, value); }
 
+        public UIElement()
+        {
+            LayoutCache.MeasureInvalidated += _ => LayoutManager.Instance.InvalidateArrange(this);
+            LayoutCache.ArrangeInvalidated += _ => LayoutManager.Instance.InvalidateArrange(this);
+        }
+
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
-            UpdateLayoutCss();
-            InvalidateMeasure();
-        }
 
-        private void UpdateLayoutCss()
-        {
             var sb = new StringBuilder();
-            ComputeOwnLayoutCss(sb);
-            (Parent as UIElement)?.ComputeChildLayoutCss(sb, this);
-            StyleCss = sb.ToString();
+            ComputeCss(sb);
+            CssStyle = sb.ToString();
+
+            LayoutCache.InvalidateMeasure();
         }
 
-        protected virtual void ComputeOwnLayoutCss(StringBuilder sb)
+        protected virtual void ComputeCss(StringBuilder sb)
         {
             if (Opacity != 1)
                 sb.Append($"opacity: {Opacity}; ");
         }
 
-        protected virtual void ComputeChildLayoutCss(StringBuilder sb, UIElement child)
+        protected override void OnAfterRender()
         {
+            base.OnAfterRender();
+            ApplyBounds();
         }
 
-        private void ApplyBounds()
+        protected void ApplyBounds()
         {
+            // Note: Some UIElements may not have a root div. TODO: Should we change this?
             var bounds = LayoutCache.RelativeBounds;
             RegisteredFunction.Invoke<object>("Xamzor.layout", LayoutRoot, bounds.X, bounds.Y, bounds.Width, bounds.Height);
         }
 
-
-
         public void RaiseStateHasChanged() => StateHasChanged();
-
-        public void InvalidateMeasure()
-        {
-            if (LayoutCache.IsMeasureValid)
-            {
-                LayoutCache.InvalidateMeasure();
-                LayoutManager.Instance.InvalidateMeasure(this);
-            }
-        }
-
-        public void InvalidateArrange()
-        {
-            if (LayoutCache.IsArrangeValid)
-            {
-                LayoutCache.InvalidateArrange();
-                LayoutManager.Instance.InvalidateArrange(this);
-            }
-        }
-
+        
         public LayoutCache LayoutCache = new LayoutCache();
 
-        public LayoutFunc Layout =>
-            Layouts.TraceSpecial(Tag,
+        public virtual LayoutFunc Layout =>
+            Layouts.TraceSpecial(ToString(),
                 Layouts.Callback(onArrangeOut: (_, __) => ApplyBounds(), child:
                     Layouts.StandardLayout(
                         new StandardLayoutProperties(
@@ -114,7 +94,7 @@ namespace Xamzor.UI.Components
                             new Vector2(MaxWidth, MaxHeight),
                             HorizontalAlignment,
                             VerticalAlignment),
-                        ref LayoutCache, ChildLayout)));
+                        LayoutCache, Layouts.FillSpace(ChildLayout))));
 
         protected virtual LayoutFunc ChildLayout => Layouts.Overlay(Children.OfType<UIElement>().Select(child => child.Layout));
     }

@@ -15,7 +15,9 @@ namespace Xamzor.UI
                 throw new ArgumentNullException(nameof(property));
 
             if (!typeof(T).IsAssignableFrom(property.ValueType))
-                throw new ArgumentException($"Invalid property value type. Expected '{property.ValueType.Name}' or a less derived type.", nameof(T));
+                throw new ArgumentException(
+                    $"Invalid type specified when getting value of property '{property.Name}'. " + 
+                    "Expected '{property.ValueType.Name}' or a less derived type, but got '{typeof(T).Name}'.", nameof(T));
 
             return _props.TryGetValue(property, out var value)
                 ? (T)value 
@@ -35,7 +37,9 @@ namespace Xamzor.UI
             }
 
             if (!property.ValueType.IsAssignableFrom(value.GetType()))
-                throw new ArgumentException($"Invalid property value type. Expected value of type '{property.ValueType.Name}' or of a more derived type.", nameof(value));
+                throw new ArgumentException(
+                    $"Invalid value specified when setting value of property '{property.Name}'. " +
+                    $"Expected value of type '{property.ValueType.Name}' or of a more derived type, but got value of type '{value.GetType().Name}'.", nameof(value));
 
             _props[property] = value;
         }

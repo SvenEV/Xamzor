@@ -37,9 +37,9 @@ namespace Xamzor.UI.Components
                 builder.OpenElement(0, "div");
                 builder.AddAttribute(1, "id", Id);
                 builder.AddAttribute(2, "class", CssClass);
-                builder.AddAttribute(3, "style", LayoutCss);
+                builder.AddAttribute(3, "style", CssStyle);
                 builder.AddElementReferenceCapture(4, r => LayoutRoot = r);
-                BuildContentRenderTree(builder);
+                Helpers.SurroundWithParent(BuildContentRenderTree, this)(builder);
                 builder.CloseElement();
             }
         }
@@ -53,14 +53,14 @@ namespace Xamzor.UI.Components
             else if (ContentTemplate != null)
             {
                 builder.OpenComponent(0, ContentTemplate);
-                builder.AddAttribute(1, ParentProperty.Name, this);
+                builder.AddAttribute(1, ParentProperty.Name, Helpers.PARENT);
                 builder.AddAttribute(2, DataTemplate.DataContextProperty.Name, Content);
                 builder.CloseComponent();
             }
             else if (Content != null)
             {
                 builder.OpenComponent<TextBlock>(3);
-                builder.AddAttribute(4, ParentProperty.Name, this);
+                builder.AddAttribute(4, ParentProperty.Name, Helpers.PARENT);
                 builder.AddAttribute(5, TextBlock.TextProperty.Name, Content?.ToString());
                 builder.CloseComponent();
             }

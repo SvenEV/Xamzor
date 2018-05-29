@@ -52,7 +52,7 @@ namespace Xamzor.UI.Components
 
         protected ISet<XamzorComponent> Children =>
             Properties.Get<ISet<XamzorComponent>>(ChildrenProperty);
-        
+
         public XamzorComponent()
         {
             Id = GetType().Name + "-" + _nextFreeId++;
@@ -93,18 +93,6 @@ namespace Xamzor.UI.Components
 
             // Clear list of children
             Properties.Set(ChildrenProperty, new HashSet<XamzorComponent>());
-
-            // Inject helper code into ChildContent
-            if (ChildContent is RenderFragment originalChildContent)
-            {
-                ChildContent = builder =>
-                {
-                    var temp = Helpers.PARENT;
-                    Helpers.PARENT = this;
-                    originalChildContent(builder);
-                    Helpers.PARENT = temp;
-                };
-            }
 
             Parent?.Properties.Get<ISet<XamzorComponent>>(ChildrenProperty)?.Add(this);
 

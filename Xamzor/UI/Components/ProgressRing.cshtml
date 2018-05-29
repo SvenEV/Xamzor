@@ -1,6 +1,6 @@
 ﻿@inherits UIElement
 
-<div id="@Id" class="@CssClass" style="@LayoutCss" ref="LayoutRoot">
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
     @for (var i = 0; i < 6; i++)
     {
         <div><div style="background-color: @Foreground"></div></div>
@@ -13,22 +13,23 @@
 
     protected override string CssClass => base.CssClass + (IsActive? " active" : "");
 
-        [Parameter]
+    [Parameter]
     protected bool IsActive
     {
         get => Properties.Get<bool>(IsActiveProperty);
         set => Properties.Set(IsActiveProperty, value);
     }
 
-    public string Foreground { get; set; } = "mediumturquoise";
+    [Parameter]
+    protected string Foreground { get; set; } = "mediumturquoise";
 
     public ProgressRing()
     {
         MinWidth = MinHeight = 40;
     }
 
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
     }
 }

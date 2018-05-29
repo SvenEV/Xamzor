@@ -1,7 +1,7 @@
 ﻿@inherits UIElement
 
 <div id="@Id" class="@CssClass" style="@Css" ref="LayoutRoot">
-    @ChildContent
+    @ChildContent.SurroundWithParent(this)
 </div>
 
 @functions{
@@ -16,10 +16,16 @@
 
         Application.WindowResized += () =>
         {
-            InvalidateMeasure();
+            // TODO: Fix invalidation flow
+            LayoutManager.Instance.InvalidateArrange(this);
+            LayoutCache.IsArrangeValid = false;
+
+            System.Console.WriteLine("WindowResized: " + LayoutCache.IsMeasureValid + LayoutCache.IsArrangeValid);
+            LayoutCache.InvalidateMeasure();
+            System.Console.WriteLine("WindowResized: " + LayoutCache.IsMeasureValid + LayoutCache.IsArrangeValid);
             LayoutManager.Instance.RunQueuedLayoutPass();
         };
-        
+
         Owner?.OnXamzorViewInitialized(this);
     }
 
@@ -29,7 +35,6 @@
         {
             // Rendering for the first time
             LayoutManager.Instance.ExecuteInitialLayoutPass(this);
-            LayoutManager.Instance.InvalidateMeasure(this);
 
             // TODO: Calling StateHasChanged() in OnAfterRender() breaks rendering.
             //       Maybe we should report this?
@@ -39,7 +44,7 @@
         base.OnAfterRender();
     }
 
-    public Vector2 MeasureRoot()
+    public Vector2 DetermineRootSize()
     {
         try
         {
@@ -54,7 +59,7 @@
             return Vector2.Zero; // Not yet rendered
         }
     }
-    
+
     public interface IXamzorViewOwner
     {
         void OnXamzorViewInitialized(XamzorView view);

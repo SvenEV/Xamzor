@@ -1,18 +1,13 @@
 ﻿@inherits ContentControl
 
-<!--
-    TODO: We really want to use <button> here but "max-height" is zero inside buttons in Firefox
--->
-<div id="@Id" class="@CssClass" style="@LayoutCss" role="button" tabindex="0" ref="LayoutRoot"
-     onclick="@((Action<UIMouseEventArgs>)OnClicked)">
-    <!--
-        'button' seems to somehow stretch its child content, even if child content wants to
-        align left/right/center. Another 'div' in between fixes this.
-    -->
-    <div style="display: grid">
+<button id="@Id" class="@CssClass" style="@CssStyle" role="button" tabindex="0" ref="LayoutRoot"
+        onclick="@((Action<UIMouseEventArgs>)OnClicked)">
+
+    <!-- For now, styling of this Border for different button states is done in CSS -->
+    <Border Parent="this" Padding="T(12, 8)">
         @ActualContent
-    </div>
-</div>
+    </Border>
+</button>
 
 @functions{
 
@@ -25,16 +20,9 @@
 
     protected override bool OverridesContainer => true;
 
-    public XButton()
+    protected override void ComputeCss(System.Text.StringBuilder sb)
     {
-        Padding = new Thickness(12, 8);
-    }
-
-    protected override void ComputeOwnLayoutCss(System.Text.StringBuilder sb)
-    {
-        base.ComputeOwnLayoutCss(sb);
+        base.ComputeCss(sb);
         sb.Append("text-align: left; ");
     }
-
-    protected override LayoutFunc ChildLayout => Layouts.Inset(new Thickness(2), base.ChildLayout);
 }

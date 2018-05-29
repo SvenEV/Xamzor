@@ -8,6 +8,9 @@
 }
 
 Blazor.registerFunction('Xamzor.layout', (elem, x, y, w, h) => {
+    if (!elem)
+        return;
+
     elem.style.left = x + 'px';
     elem.style.top = y + 'px';
     elem.style.width = w + 'px';
@@ -19,21 +22,25 @@ Blazor.registerFunction('Xamzor.getSize', elem => {
     return bounds.width + "," + bounds.height;
 });
 
-Blazor.registerFunction('Xamzor.measureHtml', data => {
-    var container = document.getElementById('xamzorMeasureContainer');
+Blazor.registerFunction('Xamzor.measureHtml', (element, maxWidth, maxHeight) => {
+    var oldWidth = element.style.width;
+    var oldHeight = element.style.height;
+    var oldPosition = element.style.position;
 
-    if (container === null) {
-        container = document.createElement('div');
-        container.style = 'display: inline-block; visibility: hidden;';
-        container.id = 'xamzorMeasureContainer';
-        document.body.appendChild(container);
-    }
-
-    container.innerHTML = data;
-    var bounds = container.getBoundingClientRect();
+    element.style.width = null;
+    element.style.height = null;
+    element.style.position = 'fixed';
+    element.style.maxWidth = maxWidth ? maxWidth + 'px' : null;
+    element.style.maxHeight = maxHeight ? maxHeight + 'px' : null;
+    var bounds = element.getBoundingClientRect();
     var result = bounds.width + "," + bounds.height;
-    container.innerHTML = "";
+
+    element.style.width = oldWidth;
+    element.style.height = oldHeight;
+    element.style.position = oldPosition;
+
     return result;
+
 });
 
 Blazor.registerFunction('Xamzor.measureImage', source => {
@@ -56,7 +63,7 @@ Blazor.registerFunction('Xamzor.measureImage', source => {
     function returnResult() {
         xamzorInvokeCSharpMethod(
             'Xamzor.UI', 'ImageMeasureInterop', 'NotifyImageMeasured',
-            source, img.naturalWidth + ',' + img.naturalHeight);
+            [ source, img.naturalWidth + ',' + img.naturalHeight ]);
     }
 });
 
