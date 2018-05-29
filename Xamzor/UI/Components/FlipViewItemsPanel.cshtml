@@ -22,8 +22,7 @@
         sb.Append($"-ms-scroll-snap-points-{(isHorizontal ? "x" : "y")}: snapInterval(0, 100%); ");
     }
 
-    // TODO: This needs to be customized so each child consumes all the space
-    protected override LayoutFunc ChildLayout => Layouts.TraceSpecial(context =>
+    protected override LayoutFunc ChildLayout => Layouts.TraceSpecial(Layouts.Clip(context =>
     {
         var children = Children.OfType<UIElement>().Select(c => c.Layout).ToList();
 
@@ -53,5 +52,5 @@
             default:
                 throw new NotImplementedException();
         }
-    });
+    }));
 }
