@@ -15,10 +15,10 @@
 
     <div style="min-height: 24px;">
         <select bind="@TraceWriterName">
-            <option>None</option>
-            <option>Benchmark</option>
-            <option>Light Trace</option>
-            <option>Full Trace</option>
+            @foreach (var kvp in _traceWriters)
+            {
+                <option>@kvp.Key</option>
+            }
         </select>
     </div>
 
@@ -44,25 +44,7 @@
         set
         {
             _traceWriterName = value;
-            switch (value)
-            {
-                case "None": LayoutManager.Instance.TraceWriter = null; break;
-                case "Benchmark": LayoutManager.Instance.TraceWriter = new BenchmarkTraceWriter(); break;
-
-                case "Light Trace":
-                    LayoutManager.Instance.TraceWriter = new ConsoleTraceWriter
-                    {
-                        Filter = (msg, context) => msg.IsSpecial
-                    };
-                    break;
-
-                case "Full Trace":
-                    LayoutManager.Instance.TraceWriter = new ConsoleTraceWriter
-                    {
-                        Filter = (msg, context) => context.Phase == LayoutPhase.Arrange
-                    };
-                    break;
-            }
+            LayoutManager.Instance.TraceWriter = _traceWriters.TryGetValue(value, out var writer) ? writer : null;
         }
     }
 
@@ -95,5 +77,40 @@
         builder.CloseElement();
 
         builder.CloseElement();
+    };
+
+    private readonly Dictionary<string, ILayoutTraceWriter> _traceWriters = new Dictionary<string, ILayoutTraceWriter>
+    {
+        ["None"] = null,
+        ["Benchmark"] = new BenchmarkTraceWriter(),
+
+        ["Special Measures & Arranges"] = new ConsoleTraceWriter
+        {
+            Filter = args => args.Message.IsSpecial
+        },
+
+        ["'DEBUG' Measures & Arranges"] = new ConsoleTraceWriter
+        {
+            Filter = args =>
+                (args.Message.Tag?.Contains("DEBUG") ?? false) ||
+                args.Stack.Any(msg => msg.Tag?.Contains("DEBUG") ?? false)
+        },
+
+        ["Special Arranges"] = new ConsoleTraceWriter
+        {
+            Filter = args => args.Message.IsSpecial && args.Message.Phase == LayoutPhase.Arrange
+        },
+
+        ["'DEBUG' Arranges"] = new ConsoleTraceWriter
+        {
+            Filter = args =>
+                ((args.Message.Tag?.Contains("DEBUG") ?? false) || args.Stack.Any(msg => msg.Tag?.Contains("DEBUG") ?? false)) &&
+                args.Message.Phase == LayoutPhase.Arrange
+        },
+
+        ["Arranges"] = new ConsoleTraceWriter
+        {
+            Filter = args => args.Message.Phase == LayoutPhase.Arrange
+        }
     };
 }
