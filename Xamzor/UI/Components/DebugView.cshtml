@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Blazor.RenderTree
+﻿@using Layman.Diagnostics
 
 <div style="position: absolute; left: 0; width: 500px; height: 100%; z-index: 1000;
             background-color: black; display: flex; flex-flow: column; overflow-x: auto;
@@ -13,6 +13,15 @@
         <button onclick="@(e => LayoutManager.Instance.RunQueuedLayoutPass())">Layout</button>
     </div>
 
+    <div style="min-height: 24px;">
+        <select bind="@TraceWriterName">
+            <option>None</option>
+            <option>Benchmark</option>
+            <option>Light Trace</option>
+            <option>Full Trace</option>
+        </select>
+    </div>
+
     <ul style="color: white; font-family: 'Segoe UI'; list-style: none; margin: 0; padding-left: 20px;">
         @RenderItem(Target())
     </ul>
@@ -20,11 +29,42 @@
 </div>
 
 @functions{
+
+    private string _traceWriterName = "None";
+
     [Parameter]
     private Func<UIElement> Target { get; set; }
 
     [Parameter]
     private Action RefreshClicked { get; set; }
+
+    private string TraceWriterName
+    {
+        get => _traceWriterName;
+        set
+        {
+            _traceWriterName = value;
+            switch (value)
+            {
+                case "None": LayoutManager.Instance.TraceWriter = null; break;
+                case "Benchmark": LayoutManager.Instance.TraceWriter = new BenchmarkTraceWriter(); break;
+
+                case "Light Trace":
+                    LayoutManager.Instance.TraceWriter = new ConsoleTraceWriter
+                    {
+                        Filter = (msg, context) => msg.IsSpecial
+                    };
+                    break;
+
+                case "Full Trace":
+                    LayoutManager.Instance.TraceWriter = new ConsoleTraceWriter
+                    {
+                        Filter = (msg, context) => context.Phase == LayoutPhase.Arrange
+                    };
+                    break;
+            }
+        }
+    }
 
     private RenderFragment RenderItem(UIElement element) => builder =>
     {

@@ -72,7 +72,7 @@ namespace Xamzor.UI.Components
             ApplyBounds();
         }
 
-        protected void ApplyBounds()
+        protected virtual void ApplyBounds()
         {
             // Note: Some UIElements may not have a root div. TODO: Should we change this?
             var bounds = LayoutCache.RelativeBounds;
@@ -88,13 +88,13 @@ namespace Xamzor.UI.Components
                 Layouts.Callback(onArrangeOut: (_, __) => ApplyBounds(), child:
                     Layouts.StandardLayout(
                         new StandardLayoutProperties(
-                            Margin, Padding, 
-                            new Vector2(Width, Height), 
+                            Margin, Padding,
+                            new Vector2(Width, Height),
                             new Vector2(MinWidth, MinHeight),
                             new Vector2(MaxWidth, MaxHeight),
                             HorizontalAlignment,
                             VerticalAlignment),
-                        LayoutCache, Layouts.FillSpace(ChildLayout))));
+                        LayoutCache, Layouts.FillSpace(FillSpaceMode.AllowOverflow, ChildLayout))));
 
         protected virtual LayoutFunc ChildLayout => Layouts.Overlay(Children.OfType<UIElement>().Select(child => child.Layout));
     }

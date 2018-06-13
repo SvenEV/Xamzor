@@ -1,10 +1,15 @@
-﻿function xamzorInvokeCSharpMethod(namespace, typeName, methodName, args) {
-    const assemblyName = 'Xamzor';
-    const method = Blazor.platform.findMethod(assemblyName, namespace, typeName, methodName);
-    var csArgs = [];
-    if (args)
-        args.forEach(arg => csArgs.push(Blazor.platform.toDotNetString(arg)));
-    let resultAsDotNetString = Blazor.platform.callMethod(method, null, csArgs);
+﻿function xamzorInvokeCSharpMethod(typeName, methodName, args) {
+    var methodOptions = {
+        type: {
+            assembly: 'Xamzor',
+            name: typeName
+        },
+        method: {
+            name: methodName
+        }
+    };
+
+    Blazor.invokeDotNetMethod(methodOptions, args);
 }
 
 Blazor.registerFunction('Xamzor.layout', (elem, x, y, w, h) => {
@@ -40,32 +45,26 @@ Blazor.registerFunction('Xamzor.measureHtml', (element, maxWidth, maxHeight) => 
     element.style.position = oldPosition;
 
     return result;
-
 });
 
-Blazor.registerFunction('Xamzor.measureImage', source => {
+Blazor.registerFunction('Xamzor.measureImageAsync', source => new Promise((resolve, reject) => {
     var img = document.createElement('img');
     img.style = "visibility: collapse";
-    img.src = source;
 
-    img.onload = function () {
-        returnResult();
+    img.onload = () => {
+        resolve(img.naturalWidth + ',' + img.naturalHeight);
         document.body.removeChild(img);
     };
 
-    img.onerror = function () {
-        returnResult();
+    img.onerror = () => {
+        reject();
         document.body.removeChild(img);
     };
 
+    // TODO: Remove trimming if strings are correctly passed without extra quotes
+    img.src = source.substring(1, source.length - 1);
     document.body.appendChild(img);
-
-    function returnResult() {
-        xamzorInvokeCSharpMethod(
-            'Xamzor.UI', 'ImageMeasureInterop', 'NotifyImageMeasured',
-            [ source, img.naturalWidth + ',' + img.naturalHeight ]);
-    }
-});
+}));
 
 window.addEventListener('resize', () =>
-    xamzorInvokeCSharpMethod('Xamzor.UI', 'Application', 'JSNotifyWindowResized'));
+    xamzorInvokeCSharpMethod('Xamzor.UI.Application', 'JSNotifyWindowResized'));

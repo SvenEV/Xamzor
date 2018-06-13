@@ -1,0 +1,65 @@
+﻿@inherits DataTemplate
+
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
+
+    <Grid Parent="this"
+          RowDefinitions="@Rows("Auto", "Auto")"
+          ColumnDefinitions="@Columns("Auto", "Auto")">
+
+        <TextBlock Parent="PARENT" FontWeight="FontWeight.Bold"
+                   Text="Alignment" Row="1"
+                   VerticalAlignment="Center"
+                   Margin="T(0, 0, 8, 0)" />
+
+        <TextBlock Parent="PARENT" FontWeight="FontWeight.Bold"
+                   Text="StretchMode" Column="1"
+                   HorizontalAlignment="Center"
+                   Margin="T(0, 0, 0, 8)" />
+
+        <Grid Parent="PARENT" Row="1" Column="1" Background="violet"
+              RowDefinitions="@Rows("Auto", "100", "100", "100", "100")"
+              ColumnDefinitions="@Columns("Auto", "100", "100", "100", "100")">
+
+            <TextBlock Parent="PARENT" Column="1" Text="None" />
+            <TextBlock Parent="PARENT" Column="2" Text="Fill" />
+            <TextBlock Parent="PARENT" Column="3" Text="Uniform" />
+            <TextBlock Parent="PARENT" Column="4" Text="UniformToFill" />
+
+            <TextBlock Parent="PARENT" Row="1" Text="Left/Top" />
+            <TextBlock Parent="PARENT" Row="2" Text="Center/Center" />
+            <TextBlock Parent="PARENT" Row="3" Text="Right/Bottom" />
+            <TextBlock Parent="PARENT" Row="4" Text="Stretch/Stretch" />
+
+            <Image Parent="PARENT" Source="testcard.png" Row="1" Column="1" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Image Parent="PARENT" Source="testcard.png" Row="2" Column="1" Stretch="None" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Image Parent="PARENT" Source="testcard.png" Row="3" Column="1" Stretch="None" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+            <Image Parent="PARENT" Source="testcard.png" Row="4" Column="1" Stretch="None" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <Image Parent="PARENT" Source="testcard.png" Row="1" Column="2" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Image Parent="PARENT" Source="testcard.png" Row="2" Column="2" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Image Parent="PARENT" Source="testcard.png" Row="3" Column="2" Stretch="Fill" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+            <Image Parent="PARENT" Source="testcard.png" Row="4" Column="2" Stretch="Fill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <Image Parent="PARENT" Source="testcard.png" Row="1" Column="3" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Image Parent="PARENT" Source="testcard.png" Row="2" Column="3" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Image Parent="PARENT" Source="testcard.png" Row="3" Column="3" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+            <Image Parent="PARENT" Source="testcard.png" Row="4" Column="3" Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <Image Parent="PARENT" Source="testcard.png" Row="1" Column="4" Stretch="UniformToFill" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Image Parent="PARENT" Source="testcard.png" Row="2" Column="4" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Image Parent="PARENT" Source="testcard.png" Row="3" Column="4" Stretch="UniformToFill" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+            <Image Parent="PARENT" Source="testcard.png" Row="4" Column="4" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+        </Grid>
+
+    </Grid>
+    
+
+</div>
+
+@functions{
+    private LayoutController _stack;
+    private LayoutController _box1;
+    private LayoutController _box2;
+    private LayoutController _box3;
+}

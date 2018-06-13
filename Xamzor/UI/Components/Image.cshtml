@@ -1,8 +1,10 @@
 ﻿@using static Layman.Layouts
 @inherits UIElement
 
-<img id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot"
-     src="@Source" onerror="this.style.display = 'none'" />
+<div id="@Id" class="@CssClass" style="@CssStyle" ref="LayoutRoot">
+    <img ref="_image" onerror="this.style.display = 'none'"
+         src="@Source" style="position: absolute;" />
+</div>
 
 @functions{
 
@@ -15,6 +17,8 @@
     [Parameter] protected StretchDirection StretchDirection { get => Properties.Get<StretchDirection>(StretchDirectionProperty); set => Properties.Set(StretchDirectionProperty, value); }
 
     private Vector2 _imageSize;
+    private LayoutCache _imgLayoutCache = new LayoutCache();
+    private ElementRef _image;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -27,16 +31,27 @@
         LayoutCache?.InvalidateMeasure();
     }
 
-    // TODO: Incorporate scaling into StandardLayout because why not?
-    // ====> Maybe the FillSpace() call speaks against this...?
+    protected override void ApplyBounds()
+    {
+        var bounds = LayoutCache.RelativeBounds;
+        RegisteredFunction.Invoke<object>("Xamzor.layout", LayoutRoot, bounds.X, bounds.Y, bounds.Width, bounds.Height);
+
+        bounds = _imgLayoutCache.RelativeBounds;
+        RegisteredFunction.Invoke<object>("Xamzor.layout", _image, bounds.X, bounds.Y, bounds.Width, bounds.Height);
+    }
+
     public override LayoutFunc Layout =>
-        TraceSpecial(ToString(),
-            Callback(onArrangeOut: (_, __) => ApplyBounds(), child:
-                Inset(Margin,
-                    Cache(LayoutCache,
-                        Align(HorizontalAlignment, VerticalAlignment,
-                            FixedSize(new Vector2(Width, Height),
-                                ClampSize(new Vector2(MinWidth, MinHeight), new Vector2(MaxWidth, MaxHeight),
-                                    Scale(Stretch, StretchDirection,
-                                        FixedSize(_imageSize)))))))));
+        Layouts.TraceSpecial(ToString(),
+            Layouts.Callback(onArrangeOut: (_, __) => ApplyBounds(), child:
+                FillSpace(FillSpaceMode.AllowOverflow,
+                    Inset(Margin,
+                        Cache(LayoutCache,
+                            FillSpace(FillSpaceMode.Exact,
+                                Cache(_imgLayoutCache,
+                                    Align(HorizontalAlignment, VerticalAlignment,
+                                        FixedSize(new Vector2(Width, Height),
+                                            ClampSize(new Vector2(MinWidth, MinHeight), new Vector2(MaxWidth, MaxHeight),
+                                                Inset(Padding,
+                                                    Scale(Stretch, StretchDirection,
+                                                        FixedSize(_imageSize)))))))))))));
 }

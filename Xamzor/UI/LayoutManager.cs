@@ -7,18 +7,13 @@ namespace Xamzor.UI
 {
     public class LayoutManager
     {
-        private readonly ILayoutTraceWriter _traceWriter = new BenchmarkTraceWriter();
-        //private readonly ILayoutTraceWriter _traceWriter = new ConsoleTraceWriter
-        //{
-        //    IgnoreNonSpecial = true,
-        //    //IgnoredPrefixes = { "Align", "Fixed", "Clamp", "Inset", "Cache" }
-        //};
-
         private readonly Queue<UIElement> _toArrange = new Queue<UIElement>();
         private bool _queued;
         private bool _running;
 
         public static LayoutManager Instance { get; } = new LayoutManager();
+
+        public ILayoutTraceWriter TraceWriter { get; set; }
         
         public void InvalidateArrange(UIElement control)
         {
@@ -98,7 +93,7 @@ namespace Xamzor.UI
 
                 UILog.Write("LAYMAN", $"Arranging '{control}' with {rect}");
 
-                var context = LayoutContext.CreateForArrange(rect, _traceWriter);
+                var context = LayoutContext.CreateForArrange(rect, TraceWriter);
                 control.Layout(context);
             }
         }
