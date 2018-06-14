@@ -94,7 +94,7 @@ namespace Xamzor.UI.Components
                             new Vector2(MaxWidth, MaxHeight),
                             HorizontalAlignment,
                             VerticalAlignment),
-                        LayoutCache, Layouts.FillSpace(FillSpaceMode.AllowOverflow, ChildLayout))));
+                        LayoutCache, Layouts.FillSpace(FillSpaceMode.Exact, ChildLayout))));
 
         protected virtual LayoutFunc ChildLayout => Layouts.Overlay(Children.OfType<UIElement>().Select(child => child.Layout));
     }
